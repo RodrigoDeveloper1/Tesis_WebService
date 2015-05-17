@@ -1,0 +1,6 @@
+C:\Users\Rodrigo\Documents\TesisWorkspace\Servicios Web\Tesis_WebService\Tesis_WebService\bin\Tesis_WebService.dll.config
+C:\Users\Rodrigo\Documents\TesisWorkspace\Servicios Web\Tesis_WebService\Tesis_WebService\bin\Tesis_WebService.dll
+C:\Users\Rodrigo\Documents\TesisWorkspace\Servicios Web\Tesis_WebService\Tesis_WebService\bin\Tesis_WebService.pdb
+C:\Users\Rodrigo\Documents\TesisWorkspace\Servicios Web\Tesis_WebService\Tesis_WebService\obj\Debug\Tesis_WebService.csprojResolveAssemblyReference.cache
+C:\Users\Rodrigo\Documents\TesisWorkspace\Servicios Web\Tesis_WebService\Tesis_WebService\obj\Debug\Tesis_WebService.dll
+C:\Users\Rodrigo\Documents\TesisWorkspace\Servicios Web\Tesis_WebService\Tesis_WebService\obj\Debug\Tesis_WebService.pdb
