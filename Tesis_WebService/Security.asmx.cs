@@ -29,7 +29,7 @@ namespace Tesis_WebService
             object result;
             #endregion
             #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = new SqlConnection(ConstantsRepository.DATABASE_CONNECTION);
+            SqlConnection sqlConnection = new SqlConnection(ConstantsRepository.APPHARBOR_DATABASE_CONNECTION);
             #endregion
             #region Definiendo el query
             string query =
@@ -100,7 +100,7 @@ namespace Tesis_WebService
             object result;
             #endregion
             #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = new SqlConnection(ConstantsRepository.DATABASE_CONNECTION);
+            SqlConnection sqlConnection = new SqlConnection(ConstantsRepository.APPHARBOR_DATABASE_CONNECTION);
             #endregion
             #region Definiendo el query
             string query =
@@ -213,7 +213,7 @@ namespace Tesis_WebService
             List<string> listaCursos = new List<string>();
             #endregion
             #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = new SqlConnection(ConstantsRepository.DATABASE_CONNECTION);
+            SqlConnection sqlConnection = new SqlConnection(ConstantsRepository.APPHARBOR_DATABASE_CONNECTION);
             #endregion
             #region Definiendo query de estudiantes asociados
             string query1 = "SELECT S.STUDENTID StudentId, " +
