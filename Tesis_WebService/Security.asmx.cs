@@ -29,10 +29,10 @@ namespace Tesis_WebService
         private SqlConnection Conexion()
         {
             ///AppHarbor Server
-            //string conexion = ConstantsRepository.APPHARBOR_DATABASE_CONNECTION;
+            string conexion = ConstantsRepository.APPHARBOR_DATABASE_CONNECTION;
 
             ///Localhost
-            string conexion = ConstantsRepository.SQLSERVER_EXPRESS_EDITION_DATABASE_CONNECTION;
+            //string conexion = ConstantsRepository.SQLSERVER_EXPRESS_EDITION_DATABASE_CONNECTION;
 
             return new SqlConnection(conexion);
         }
