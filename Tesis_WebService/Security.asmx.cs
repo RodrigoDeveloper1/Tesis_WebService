@@ -506,7 +506,7 @@ namespace Tesis_WebService
             string path = ConstantsRepository.STATISTICS_IMAGES_PATH;
 
             string imgPath1 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
-                ConstantsRepository.STATISTICS_IMG_1;
+                ConstantsRepository.STATISTICS_IMG_1;            
             string imgPath2 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
                 ConstantsRepository.STATISTICS_IMG_2;
 
@@ -549,7 +549,11 @@ namespace Tesis_WebService
             }
             catch (Exception e)
             {
-                result.Add(new { Success = false, Exception = e.Message, Path1 = imgPath1, Path2 = imgPath2 });
+                result.Add(new { Success = false, 
+                    Exception = e.Message, 
+                    path = path,
+                    Path1 = imgPath1, 
+                    Path2 = imgPath2 });
                 return new JavaScriptSerializer().Serialize(result);
             }
         }
