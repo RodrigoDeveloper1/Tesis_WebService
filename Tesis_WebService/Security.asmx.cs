@@ -549,11 +549,14 @@ namespace Tesis_WebService
             }
             catch (Exception e)
             {
-                result.Add(new { Success = false, 
-                    Exception = e.Message, 
-                    path = path,
-                    Path1 = imgPath1, 
-                    Path2 = imgPath2 });
+                result.Add(new
+                {
+                    Success = false,
+                    Exception = e.Message
+                });
+                    //path = path,
+                    //Path1 = imgPath1, 
+                    //Path2 = imgPath2 });
                 return new JavaScriptSerializer().Serialize(result);
             }
         }
