@@ -45,6 +45,8 @@ namespace Tesis_WebService
             object result;
             string CourseId = "";
             string CourseName = "";
+            string CourseGrade = "";
+            string CourseSection = "";
             string Materias = "";
             string NroAlumnos = "";
             bool SiHayData = false;
@@ -56,6 +58,8 @@ namespace Tesis_WebService
             string queryI =
                 "SELECT C.CourseId CourseId, " +
                        "C.Name CourseName, " +
+                       "C.Grade CourseGrade, " +
+                       "C.Section CourseSection " +
                        "SU.SubjectId SubjectId, " +
                        "SU.Name SubjectName, " +
                        "SU.SubjectCode SubjectCode, " +
@@ -98,6 +102,8 @@ namespace Tesis_WebService
                     SiHayData = true;
                     CourseId = reader["CourseId"].ToString();
                     CourseName = reader["CourseName"].ToString();
+                    CourseGrade = reader["CourseGrade"].ToString();
+                    CourseSection = reader["CourseSection"].ToString();
                     Materias += reader["SubjectName"].ToString() + " (" +
                                 reader["UserName"].ToString() + " " +
                                 reader["UserLastName"].ToString() + ")_";
@@ -121,6 +127,8 @@ namespace Tesis_WebService
                         Success = true,
                         CourseId = CourseId,
                         CourseName = CourseName,
+                        CourseGrade = CourseGrade,
+                        CourseSection = CourseSection,
                         NroAlumnos = NroAlumnos,
                         Materias = Materias
                     };
@@ -215,6 +223,7 @@ namespace Tesis_WebService
                     string SchoolYearId = reader["SchoolYearId"].ToString();
                     string SchoolYear_StartDate = Convert.ToDateTime(reader["SchoolYear_StartDate"].ToString()).ToShortDateString();
                     string SchoolYear_EndDate = Convert.ToDateTime(reader["SchoolYear_EndDate"].ToString()).ToShortDateString();
+                    string PeriodId = reader["PeriodId"].ToString();
                     string Period_Name = reader["Period_Name"].ToString();
                     string Representative_Name = reader["Representative_Name"].ToString();
                     string Representative_LastName = reader["Representative_LastName"].ToString();
@@ -228,6 +237,7 @@ namespace Tesis_WebService
                         SchoolYearId = SchoolYearId,
                         SchoolYear_StartDate = SchoolYear_StartDate,
                         SchoolYear_EndDate = SchoolYear_EndDate,
+                        PeriodId = PeriodId,
                         Period_Name = Period_Name,
                         Representative_Name = Representative_Name,
                         Representative_LastName = Representative_LastName
