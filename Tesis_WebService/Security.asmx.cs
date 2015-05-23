@@ -59,7 +59,7 @@ namespace Tesis_WebService
                 "SELECT C.CourseId CourseId, " +
                        "C.Name CourseName, " +
                        "C.Grade CourseGrade, " +
-                       "C.Section CourseSection " +
+                       "C.Section CourseSection, " +
                        "SU.SubjectId SubjectId, " +
                        "SU.Name SubjectName, " +
                        "SU.SubjectCode SubjectCode, " +
