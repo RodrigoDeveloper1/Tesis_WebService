@@ -503,7 +503,7 @@ namespace Tesis_WebService
         {
             List<object> result = new List<object>();
 
-            string path = ConstantsRepository.STATISTICS_IMAGES_PATH_RESOURCES;
+            string path = ConstantsRepository.STATISTICS_IMAGES_PATH_APP_UPLOADS;
 
             string imgPath1 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
                 ConstantsRepository.STATISTICS_IMG_1;            
