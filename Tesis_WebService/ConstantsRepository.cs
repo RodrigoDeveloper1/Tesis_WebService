@@ -19,10 +19,7 @@ namespace Tesis_WebService
         public const string APPHARBOR_DATABASE = "db22868d3ad01347a89930a49b015d6de0";
         #endregion
 
-        public const string STATISTICS_IMAGES_PATH = @"~\App_Data\MobileApp_Statistics\";
         public const string STATISTICS_IMAGES_PATH_APP_UPLOADS = @"~\App_Uploads\MobileApp_Statistics\";
-        public const string STATISTICS_IMAGES_PATH_RESOURCES = @"~\Resources\images\";
-        public const string STATISTICS_IMAGES_PATH_images = @"~\images\";
         public const string STATISTICS_IMG_1 = "AprobadosVsReprobados.PNG";
         public const string STATISTICS_IMG_2 = "Top10ResultadosDestacados.PNG";
     }
