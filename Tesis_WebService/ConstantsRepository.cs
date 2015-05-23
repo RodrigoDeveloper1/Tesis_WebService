@@ -21,6 +21,8 @@ namespace Tesis_WebService
 
         public const string STATISTICS_IMAGES_PATH = @"~\App_Data\MobileApp_Statistics\";
         public const string STATISTICS_IMAGES_PATH_APP_UPLOADS = @"~\App_Uploads\MobileApp_Statistics\";
+        public const string STATISTICS_IMAGES_PATH_RESOURCES = @"~\Resources\images\";
+        public const string STATISTICS_IMAGES_PATH_images = @"~\images\";
         public const string STATISTICS_IMG_1 = "AprobadosVsReprobados.PNG";
         public const string STATISTICS_IMG_2 = "Top10ResultadosDestacados.PNG";
     }
