@@ -499,13 +499,19 @@ namespace Tesis_WebService
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public string Statistics(string SchoolId)
+        public string Statistics(string SchoolId, string SchoolYearId, string CourseId)
         {
             List<object> result = new List<object>();
             
-            string path = ConstantsRepository.STATISTICS_IMAGES_PATH + SchoolId;
-            string imgPath1 = Path.Combine(Server.MapPath(path), ConstantsRepository.STATISTICS_IMG_1);
-            string imgPath2 = Path.Combine(Server.MapPath(path), ConstantsRepository.STATISTICS_IMG_2);
+            string path = ConstantsRepository.STATISTICS_IMAGES_PATH;
+
+            string imgPath1 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
+                ConstantsRepository.STATISTICS_IMG_1;
+            string imgPath2 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
+                ConstantsRepository.STATISTICS_IMG_2;
+
+            imgPath1 = Path.Combine(Server.MapPath(path), imgPath1);
+            imgPath2 = Path.Combine(Server.MapPath(path), imgPath2);
 
             try
             {
@@ -543,7 +549,7 @@ namespace Tesis_WebService
             }
             catch (Exception e)
             {
-                result.Add(new { Success = false, Exception = e.Message });
+                result.Add(new { Success = false, Exception = e.Message, Path1 = imgPath1, Path2 = imgPath2 });
                 return new JavaScriptSerializer().Serialize(result);
             }
         }
