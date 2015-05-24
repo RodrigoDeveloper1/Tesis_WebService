@@ -501,9 +501,12 @@ namespace Tesis_WebService
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string Statistics(string SchoolId, string SchoolYearId, string CourseId)
         {
+            #region Declaración de la variable resultado
             List<object> result = new List<object>();
-
+            #endregion
+            #region Configurando la ruta de las imágenes
             string path = ConstantsRepository.STATISTICS_IMAGES_PATH_APP_UPLOADS;
+            path += @"\School_" + SchoolId + @"\SchoolYear_" + SchoolYearId + @"\";
 
             string imgPath1 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
                 ConstantsRepository.STATISTICS_IMG_1;            
@@ -512,12 +515,15 @@ namespace Tesis_WebService
 
             imgPath1 = Path.Combine(Server.MapPath(path), imgPath1);
             imgPath2 = Path.Combine(Server.MapPath(path), imgPath2);
+            #endregion
 
             try
             {
+                #region Obteniendo imágenes desde rutas
                 Image img1 = Image.FromFile(imgPath1);
                 Image img2 = Image.FromFile(imgPath2);
-
+                #endregion
+                #region Operaciones de conversión a byte[]
                 MemoryStream stream1 = new MemoryStream();
                 MemoryStream stream2 = new MemoryStream();
 
@@ -529,10 +535,11 @@ namespace Tesis_WebService
 
                 string imageBase64_1 = Convert.ToBase64String(imageByte1);
                 string imageBase64_2 = Convert.ToBase64String(imageByte2);
-
+                
                 stream1.Dispose(); stream2.Dispose();
                 img1.Dispose(); img2.Dispose();
-
+                #endregion
+                #region Añadiendo los resultados
                 result.Add(new 
                 { 
                     Title = "Aprobados vs Reprobados",
@@ -544,9 +551,11 @@ namespace Tesis_WebService
                     Title = "Top 10 resultados destacados",
                     Image = imageBase64_2
                 });
+                #endregion
 
                 return new JavaScriptSerializer().Serialize(result);
             }
+            #region Catch del error
             catch (Exception e)
             {
                 result.Add(new
@@ -556,6 +565,7 @@ namespace Tesis_WebService
                 });
                 return new JavaScriptSerializer().Serialize(result);
             }
+            #endregion
         }
 
         [WebMethod]

@@ -52,8 +52,14 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Uploads\MobileApp_Statistics\S1Y1C3_AprobadosVsReprobados.png" />
-    <Content Include="App_Uploads\MobileApp_Statistics\S1Y1C3_Top10ResultadosDestacados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C1_AprobadosVsReprobados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C1_Top10ResultadosDestacados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C2_AprobadosVsReprobados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C2_Top10ResultadosDestacados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C3_AprobadosVsReprobados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C3_Top10ResultadosDestacados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C4_AprobadosVsReprobados.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C4_Top10ResultadosDestacados.png" />
     <Content Include="Security.asmx" />
     <Content Include="Web.config" />
   </ItemGroup>
