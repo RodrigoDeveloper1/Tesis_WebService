@@ -44,7 +44,7 @@ namespace Tesis_WebService
             #region Declarando variables
             object result;
             string CourseId = "", CourseName = "", CourseSection = "", Materias = "", SubjectName = "", 
-                AssessmentName = "", AssessmentId = "";
+                AssessmentName = "", AssessmentId = "", PromedioString = "";
             int CourseGrade = 0, NroAlumnos = 0;
             double Promedio = 0;
             bool SiHayData = false;
@@ -183,6 +183,17 @@ namespace Tesis_WebService
                 Promedio = (double)Promedio / NroAlumnos;
                 #endregion
 
+                if (CourseGrade > 6) //Bachillerato
+                    PromedioString = Math.Round(Promedio, 2).ToString();
+                else //Primaria
+                {
+                    if (Math.Round(Promedio) == 1) PromedioString = "A";
+                    else if (Math.Round(Promedio) == 2) PromedioString = "B";
+                    else if (Math.Round(Promedio) == 3) PromedioString = "C";
+                    else if (Math.Round(Promedio) == 4) PromedioString = "D";
+                    else if (Math.Round(Promedio) == 5) PromedioString = "E";
+                }
+
                 result = new
                 {
                     Success = true,
@@ -193,7 +204,7 @@ namespace Tesis_WebService
                     NroAlumnos = NroAlumnos,
                     Materias = Materias,
                     Assessment_Name = SubjectName + " - " + AssessmentName,
-                    Promedio = Math.Round(Promedio, 2).ToString()
+                    Promedio = PromedioString
                 };
 
                 return new JavaScriptSerializer().Serialize(result);
@@ -222,10 +233,10 @@ namespace Tesis_WebService
         {
             #region Declaración de variables
             object result = null;
-            string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "";
-            string SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "";
-            string Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "";
-            string AssessmentName = "", AssessmentId = "";
+            string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "", 
+                SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "", 
+                Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "", 
+                PromedioString = "", AssessmentName = "", AssessmentId = "";
             int Grade = 0, NroEstudiantes = 0;
             double Promedio = 0;
             #endregion
@@ -374,8 +385,18 @@ namespace Tesis_WebService
                         else if (reader["LetterScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
                     }
                 }
-
                 Promedio = (double)Promedio / NroEstudiantes;
+
+                if (Grade > 6) //Bachillerato
+                    PromedioString = Math.Round(Promedio, 2).ToString();
+                else //Primaria
+                {
+                    if (Math.Round(Promedio) == 1) PromedioString = "A";
+                    else if (Math.Round(Promedio) == 2) PromedioString = "B";
+                    else if (Math.Round(Promedio) == 3) PromedioString = "C";
+                    else if (Math.Round(Promedio) == 4) PromedioString = "D";
+                    else if (Math.Round(Promedio) == 5) PromedioString = "E";
+                }
                 #endregion
                 #region Resultado final
                 result = new
@@ -392,7 +413,7 @@ namespace Tesis_WebService
                     Representative_LastName = Representative_LastName,
                     Course_Name = Course_Name,
                     Assessment_Name = SubjectName + " - " + AssessmentName,
-                    Promedio = Math.Round(Promedio, 2).ToString()
+                    Promedio = PromedioString
                 };
                 #endregion
 
