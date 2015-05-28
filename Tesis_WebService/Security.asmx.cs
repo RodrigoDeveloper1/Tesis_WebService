@@ -182,7 +182,8 @@ namespace Tesis_WebService
                         "CONVERT(DATE, P.StartDate, 103) Period_StartDate, " +
                         "CONVERT(DATE, P.FinishDate, 103) Period_FinishDate, " +
                         "R.Name Representative_Name, " +
-                        "R.LastName Representative_LastName " +
+                        "R.LastName Representative_LastName, " +
+                        "C.Name CourseName " +
                 "FROM REPRESENTATIVES R, " +
                      "REPRESENTATIVESTUDENTS RS, " +
                      "STUDENTS S, " +
@@ -227,6 +228,7 @@ namespace Tesis_WebService
                     string Period_Name = reader["Period_Name"].ToString();
                     string Representative_Name = reader["Representative_Name"].ToString();
                     string Representative_LastName = reader["Representative_LastName"].ToString();
+                    string Course_Name = reader["CourseName"].ToString();
 
                     sqlConnection.Close();
                     result = new
@@ -240,7 +242,8 @@ namespace Tesis_WebService
                         PeriodId = PeriodId,
                         Period_Name = Period_Name,
                         Representative_Name = Representative_Name,
-                        Representative_LastName = Representative_LastName
+                        Representative_LastName = Representative_LastName,
+                        Course_Name = Course_Name
                     };
 
                     return new JavaScriptSerializer().Serialize(result);
