@@ -163,8 +163,14 @@ namespace Tesis_WebService
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string Home(string UserId)
         {
-            #region Declarando la variable de resultado
-            object result;
+            #region Declaración de variables
+            object result = null;
+            string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "";
+            string SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "";
+            string Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "";
+            string AssessmentName = "", AssessmentId = "";
+            int Grade = 0, NroEstudiantes = 0;
+            double Promedio = 0;
             #endregion
             #region Estableciendo la conexión a BD
             SqlConnection sqlConnection = Conexion();
@@ -183,7 +189,9 @@ namespace Tesis_WebService
                         "CONVERT(DATE, P.FinishDate, 103) Period_FinishDate, " +
                         "R.Name Representative_Name, " +
                         "R.LastName Representative_LastName, " +
-                        "C.Name CourseName " +
+                        "C.Name CourseName, " +
+                        "C.CourseId CourseId, " +
+                        "C.Grade Grade " +
                 "FROM REPRESENTATIVES R, " +
                      "REPRESENTATIVESTUDENTS RS, " +
                      "STUDENTS S, " +
@@ -206,58 +214,137 @@ namespace Tesis_WebService
                       "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE)";
             /*Este query no incluye obtener información después de la fecha de finalización del último lapso*/
             #endregion
+            #region Definiendo el query I/2
+            string queryI2 = 
+                "SELECT COUNT(S.StudentId) NroEstudiantes " + 
+                "FROM COURSES C, " + 
+                     "StudentCourses SC, " + 
+                     "Students S " + 
+                "WHERE C.CourseId = SC.Course_CourseId AND " + 
+                      "SC.Student_StudentId = S.StudentId AND " + 
+                      "C.CourseId = @CourseId";
+            #endregion
+            #region Definiendo el query II
+            string queryII = 
+                "SELECT TOP(1) " +
+                    "A.[Name] AssessmentName, " + 
+                    "A.AssessmentId AssessmentId, " +
+                    "SUB.[Name] SubjectName " + 
+                "FROM Assessments A, " +                      
+                     "Courses C, " + 
+                     "CASUs CASU, " + 
+                     "Subjects SUB " +
+                "WHERE A.CASU_CourseId = CASU.CourseId AND " +
+                      "A.CASU_PeriodId = CASU.PeriodId AND " + 
+                      "A.CASU_SubjectId = CASU.SubjectId AND " + 
+                      "CASU.CourseId = C.CourseId AND " + 
+                      "C.CourseId = @CourseId AND " + 
+                      "CASU.SubjectId = SUB.SubjectId " + 
+                "ORDER BY A.FinishDate, A.EndHour";
+            #endregion
+            #region Definiendo el query III
+            string queryIII =
+                "SELECT S.NumberScore, " +
+                       "S.LetterScore " +
+                "FROM Assessments A, " +
+                     "Scores S " +
+                "WHERE A.AssessmentId = @AssessmentId AND " +
+                      "A.AssessmentId = S.AssessmentId";
+            #endregion
 
             try
             {
-                #region Abriendo la conexión y ejecutando la consulta
+                #region Operaciones para queryI
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
                 sqlCommand.Parameters.AddWithValue("@UserId", UserId);
                 SqlDataReader reader = sqlCommand.ExecuteReader();
-                #endregion
 
-                #region Si hay data
                 if (reader.Read())
                 {
-                    string SchoolId = reader["SchoolId"].ToString();
-                    string School_Name = reader["School_Name"].ToString();
-                    string SchoolYearId = reader["SchoolYearId"].ToString();
-                    string SchoolYear_StartDate = Convert.ToDateTime(reader["SchoolYear_StartDate"].ToString()).ToShortDateString();
-                    string SchoolYear_EndDate = Convert.ToDateTime(reader["SchoolYear_EndDate"].ToString()).ToShortDateString();
-                    string PeriodId = reader["PeriodId"].ToString();
-                    string Period_Name = reader["Period_Name"].ToString();
-                    string Representative_Name = reader["Representative_Name"].ToString();
-                    string Representative_LastName = reader["Representative_LastName"].ToString();
-                    string Course_Name = reader["CourseName"].ToString();
-
-                    sqlConnection.Close();
-                    result = new
-                    {
-                        Success = true,
-                        SchoolId = SchoolId,
-                        School_Name = School_Name,
-                        SchoolYearId = SchoolYearId,
-                        SchoolYear_StartDate = SchoolYear_StartDate,
-                        SchoolYear_EndDate = SchoolYear_EndDate,
-                        PeriodId = PeriodId,
-                        Period_Name = Period_Name,
-                        Representative_Name = Representative_Name,
-                        Representative_LastName = Representative_LastName,
-                        Course_Name = Course_Name
-                    };
-
-                    return new JavaScriptSerializer().Serialize(result);
+                    SchoolId = reader["SchoolId"].ToString();
+                    School_Name = reader["School_Name"].ToString();
+                    SchoolYearId = reader["SchoolYearId"].ToString();
+                    SchoolYear_StartDate = 
+                        Convert.ToDateTime(reader["SchoolYear_StartDate"].ToString()).ToShortDateString();
+                    SchoolYear_EndDate = 
+                        Convert.ToDateTime(reader["SchoolYear_EndDate"].ToString()).ToShortDateString();
+                    PeriodId = reader["PeriodId"].ToString();
+                    Period_Name = reader["Period_Name"].ToString();
+                    Representative_Name = reader["Representative_Name"].ToString();
+                    Representative_LastName = reader["Representative_LastName"].ToString();
+                    Course_Name = reader["CourseName"].ToString();
+                    CourseId = reader["CourseId"].ToString();
+                    Grade = Convert.ToInt32(reader["Grade"].ToString());
                 }
                 #endregion
-                #region No hay data
-                else
+                #region Operaciones para queryI/2
+                reader.Close();
+                sqlCommand = new SqlCommand(queryI2, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                reader = sqlCommand.ExecuteReader();
+
+                if(reader.Read())
+                    NroEstudiantes = Convert.ToInt32(reader["NroEstudiantes"].ToString());
+                #endregion
+                #region Operaciones para queryII
+                reader.Close();
+                sqlCommand = new SqlCommand(queryII, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                reader = sqlCommand.ExecuteReader();
+
+                if (reader.Read())
                 {
-                    sqlConnection.Close();
-                    result = new { Success = false, Exception = "Error. Id de usuario incorrecto." };
-
-                    return new JavaScriptSerializer().Serialize(result);
+                    SubjectName = reader["SubjectName"].ToString();
+                    AssessmentName = reader["AssessmentName"].ToString();
+                    AssessmentId = reader["AssessmentId"].ToString();
                 }
                 #endregion
+                #region Operaciones para queryIII
+                reader.Close();
+                sqlCommand = new SqlCommand(queryIII, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@AssessmentId", AssessmentId);
+                reader = sqlCommand.ExecuteReader();
+                                
+                while(reader.Read())
+                {
+                    if(Grade > 6) //Bachillerato
+                        Promedio += Convert.ToInt32(reader["NumberScore"].ToString());
+                    else //Primaria
+                    {
+                        if (reader["NumberScore"].ToString().ToUpper().Equals("A")) Promedio += 5;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("B")) Promedio += 4;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("C")) Promedio += 3;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("D")) Promedio += 2;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
+                    }
+                }
+
+                Promedio = (double)Promedio / NroEstudiantes;
+                #endregion
+                #region Resultado final
+                result = new
+                {
+                    Success = true,
+                    SchoolId = SchoolId,
+                    School_Name = School_Name,
+                    SchoolYearId = SchoolYearId,
+                    SchoolYear_StartDate = SchoolYear_StartDate,
+                    SchoolYear_EndDate = SchoolYear_EndDate,
+                    PeriodId = PeriodId,
+                    Period_Name = Period_Name,
+                    Representative_Name = Representative_Name,
+                    Representative_LastName = Representative_LastName,
+                    Course_Name = Course_Name,
+                    Assessment_Name = SubjectName + " - " + AssessmentName,
+                    Promedio = Math.Round(Promedio, 2).ToString()
+                };
+                #endregion
+
+                reader.Close();
+                sqlConnection.Close();
+
+                return new JavaScriptSerializer().Serialize(result);
             }
             #region Catch de los errores
             catch (SqlException e)
