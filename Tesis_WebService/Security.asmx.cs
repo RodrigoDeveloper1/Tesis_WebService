@@ -586,11 +586,15 @@ namespace Tesis_WebService
                 "SELECT S.* " +
                 "FROM STUDENTS S, " +
                      "RepresentativeStudents RS, " +
-                     "Representatives R " +
+                     "Representatives R, " +
+                     "StudentCourses SC, " +
+                     "Courses C " +
                 "WHERE S.StudentId = RS.Student_StudentId AND " +
                       "RS.Representative_RepresentativeId = R.RepresentativeId AND " +
-                      "R.RepresentativeId = @UserId " +
-                "ORDER BY S.RegistrationNumber";
+                      "R.RepresentativeId = @UserId AND " +
+                      "S.StudentId = SC.Student_StudentId AND " +
+                      "SC.Course_CourseId = C.CourseId " +
+                "ORDER BY C.Grade DESC";
             #endregion
 
             try
