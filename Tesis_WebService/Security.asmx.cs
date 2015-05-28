@@ -77,7 +77,7 @@ namespace Tesis_WebService
                       "CASU.CourseId = C.CourseId AND " +
                       "CASU.PeriodId = @PeriodId AND " +
                       "CASU.SubjectId = SU.SubjectId AND " +
-                      "CASU.UserId = U.Id";
+                      "CASU.TeacherId = U.Id";
             #endregion
             #region Definiendo el query II
             string queryII = "SELECT COUNT(SC.Student_StudentId) NroAlumnos " +
