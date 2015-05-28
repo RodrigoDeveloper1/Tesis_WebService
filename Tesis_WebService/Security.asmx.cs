@@ -172,11 +172,11 @@ namespace Tesis_WebService
                         Promedio += Convert.ToInt32(reader["NumberScore"].ToString());
                     else //Primaria
                     {
-                        if (reader["NumberScore"].ToString().ToUpper().Equals("A")) Promedio += 5;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("B")) Promedio += 4;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("C")) Promedio += 3;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("D")) Promedio += 2;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
+                        if (reader["LetterScore"].ToString().ToUpper().Equals("A")) Promedio += 5;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("B")) Promedio += 4;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("C")) Promedio += 3;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("D")) Promedio += 2;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
                     }
                 }
 
@@ -367,11 +367,11 @@ namespace Tesis_WebService
                         Promedio += Convert.ToInt32(reader["NumberScore"].ToString());
                     else //Primaria
                     {
-                        if (reader["NumberScore"].ToString().ToUpper().Equals("A")) Promedio += 5;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("B")) Promedio += 4;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("C")) Promedio += 3;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("D")) Promedio += 2;
-                        else if (reader["NumberScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
+                        if (reader["LetterScore"].ToString().ToUpper().Equals("A")) Promedio += 5;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("B")) Promedio += 4;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("C")) Promedio += 3;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("D")) Promedio += 2;
+                        else if (reader["LetterScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
                     }
                 }
 
