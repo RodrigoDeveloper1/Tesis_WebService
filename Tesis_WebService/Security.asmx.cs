@@ -43,12 +43,10 @@ namespace Tesis_WebService
         {
             #region Declarando variables
             object result;
-            string CourseId = "";
-            string CourseName = "";
-            string CourseGrade = "";
-            string CourseSection = "";
-            string Materias = "";
-            string NroAlumnos = "";
+            string CourseId = "", CourseName = "", CourseSection = "", Materias = "", SubjectName = "", 
+                AssessmentName = "", AssessmentId = "";
+            int CourseGrade = 0, NroAlumnos = 0;
+            double Promedio = 0;
             bool SiHayData = false;
             #endregion
             #region Estableciendo la conexión a BD
@@ -79,30 +77,56 @@ namespace Tesis_WebService
                       "CASU.SubjectId = SU.SubjectId AND " +
                       "CASU.TeacherId = U.Id";
             #endregion
-            #region Definiendo el query II
+            #region Definiendo el query II - Nro de estudiantes por curso
             string queryII = "SELECT COUNT(SC.Student_StudentId) NroAlumnos " +
                              "FROM COURSES C, " +
                                   "StudentCourses SC " +
                              "WHERE C.CourseId = @CourseId AND " +
                                    "C.CourseId = SC.Course_CourseId";
             #endregion
+            #region Definiendo el query III - Última evaluación por curso
+            string queryIII =
+                "SELECT TOP(1) " +
+                    "A.[Name] AssessmentName, " +
+                    "A.AssessmentId AssessmentId, " +
+                    "SUB.[Name] SubjectName " +
+                "FROM Assessments A, " +
+                     "Courses C, " +
+                     "CASUs CASU, " +
+                     "Subjects SUB " +
+                "WHERE A.CASU_CourseId = CASU.CourseId AND " +
+                      "A.CASU_PeriodId = CASU.PeriodId AND " +
+                      "A.CASU_SubjectId = CASU.SubjectId AND " +
+                      "CASU.CourseId = C.CourseId AND " +
+                      "C.CourseId = @CourseId AND " +
+                      "CASU.SubjectId = SUB.SubjectId " +
+                "ORDER BY A.FinishDate, A.EndHour";
+            #endregion
+            #region Definiendo el query IV - Promedio de la última evaluación
+            string queryIV =
+                "SELECT S.NumberScore, " +
+                       "S.LetterScore " +
+                "FROM Assessments A, " +
+                     "Scores S " +
+                "WHERE A.AssessmentId = @AssessmentId AND " +
+                      "A.AssessmentId = S.AssessmentId";
+            #endregion
 
             try
             {
-                #region Abriendo la conexión y ejecutando la consulta I
+                #region Operaciones para query I
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
                 sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
                 sqlCommand.Parameters.AddWithValue("@PeriodId", PeriodId);
                 SqlDataReader reader = sqlCommand.ExecuteReader();
-                #endregion
-                #region Obteniendo info del curso
+                
                 while (reader.Read())
                 {
                     SiHayData = true;
                     CourseId = reader["CourseId"].ToString();
                     CourseName = reader["CourseName"].ToString();
-                    CourseGrade = reader["CourseGrade"].ToString();
+                    CourseGrade = Convert.ToInt32(reader["CourseGrade"].ToString());
                     CourseSection = reader["CourseSection"].ToString();
                     Materias += reader["SubjectName"].ToString() + " (" +
                                 reader["UserName"].ToString() + " " +
@@ -110,7 +134,7 @@ namespace Tesis_WebService
                 }
                 reader.Close();
                 #endregion
-                #region Si hay data
+                #region Operaciones para query II
                 if (SiHayData)
                 {
                     Materias = Materias.Remove(Materias.Length - 1); //Eliminando el último caracter
@@ -120,24 +144,57 @@ namespace Tesis_WebService
                     reader = sqlCommand.ExecuteReader();
 
                     if (reader.Read())
-                        NroAlumnos = reader["NroAlumnos"].ToString();
-
-                    result = new
-                    {
-                        Success = true,
-                        CourseId = CourseId,
-                        CourseName = CourseName,
-                        CourseGrade = CourseGrade,
-                        CourseSection = CourseSection,
-                        NroAlumnos = NroAlumnos,
-                        Materias = Materias
-                    };
+                        NroAlumnos = Convert.ToInt32(reader["NroAlumnos"].ToString());
                 }
                 #endregion
-                #region No hay data
-                else
-                    result = new { Success = false, Exception = "No hay data asociada" };
+                #region Operaciones para queryIII
+                reader.Close();
+                sqlCommand = new SqlCommand(queryIII, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                reader = sqlCommand.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    SubjectName = reader["SubjectName"].ToString();
+                    AssessmentName = reader["AssessmentName"].ToString();
+                    AssessmentId = reader["AssessmentId"].ToString();
+                }
                 #endregion
+                #region Operaciones para queryIV
+                reader.Close();
+                sqlCommand = new SqlCommand(queryIV, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@AssessmentId", AssessmentId);
+                reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    if (CourseGrade > 6) //Bachillerato
+                        Promedio += Convert.ToInt32(reader["NumberScore"].ToString());
+                    else //Primaria
+                    {
+                        if (reader["NumberScore"].ToString().ToUpper().Equals("A")) Promedio += 5;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("B")) Promedio += 4;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("C")) Promedio += 3;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("D")) Promedio += 2;
+                        else if (reader["NumberScore"].ToString().ToUpper().Equals("E")) Promedio += 1;
+                    }
+                }
+
+                Promedio = (double)Promedio / NroAlumnos;
+                #endregion
+
+                result = new
+                {
+                    Success = true,
+                    CourseId = CourseId,
+                    CourseName = CourseName,
+                    CourseGrade = CourseGrade,
+                    CourseSection = CourseSection,
+                    NroAlumnos = NroAlumnos,
+                    Materias = Materias,
+                    Assessment_Name = SubjectName + " - " + AssessmentName,
+                    Promedio = Math.Round(Promedio, 2).ToString()
+                };
 
                 return new JavaScriptSerializer().Serialize(result);
             }
@@ -214,17 +271,15 @@ namespace Tesis_WebService
                       "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE)";
             /*Este query no incluye obtener información después de la fecha de finalización del último lapso*/
             #endregion
-            #region Definiendo el query I/2
-            string queryI2 = 
-                "SELECT COUNT(S.StudentId) NroEstudiantes " + 
-                "FROM COURSES C, " + 
-                     "StudentCourses SC, " + 
-                     "Students S " + 
-                "WHERE C.CourseId = SC.Course_CourseId AND " + 
-                      "SC.Student_StudentId = S.StudentId AND " + 
-                      "C.CourseId = @CourseId";
+            #region Definiendo el query I/2 - Nro de estudiantes por curso
+            string queryI2 =
+                "SELECT COUNT(SC.Student_StudentId) NroEstudiantes " +
+                             "FROM COURSES C, " +
+                                  "StudentCourses SC " +
+                             "WHERE C.CourseId = @CourseId AND " +
+                                   "C.CourseId = SC.Course_CourseId";
             #endregion
-            #region Definiendo el query II
+            #region Definiendo el query II - Última evaluación por curso
             string queryII = 
                 "SELECT TOP(1) " +
                     "A.[Name] AssessmentName, " + 
@@ -242,7 +297,7 @@ namespace Tesis_WebService
                       "CASU.SubjectId = SUB.SubjectId " + 
                 "ORDER BY A.FinishDate, A.EndHour";
             #endregion
-            #region Definiendo el query III
+            #region Definiendo el query III - Promedio de la última evaluación
             string queryIII =
                 "SELECT S.NumberScore, " +
                        "S.LetterScore " +
