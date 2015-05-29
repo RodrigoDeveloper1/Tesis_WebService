@@ -248,9 +248,9 @@ namespace Tesis_WebService
                 "SELECT TOP(1) " +
                         "SCH.SchoolId SchoolId, " +
                         "SCH.Name School_Name, " +
-                        "SCH.Address School_Address, " +
+                        /*"SCH.Address School_Address, " +
                         "SCH.Phone1 School_Phone1, " +
-                        "SCH.Phone2 School_Phone2, " +
+                        "SCH.Phone2 School_Phone2, " +*/
                         "SY.SchoolYearId SchoolYearId, " +
                         "CONVERT(DATE, SY.StartDate, 103) SchoolYear_StartDate, " +
                         "CONVERT(DATE, SY.EndDate, 103) SchoolYear_EndDate, " +
