@@ -12,7 +12,7 @@ namespace Tesis_WebService
         #endregion
 
         #region AppHarbor
-        public const string APPHARBOR_DATABASE_CONNECTION = "Server=22868d3a-d013-47a8-9930-a49b015d6de0.sqlserver.sequelizer.com;Database=db22868d3ad01347a89930a49b015d6de0;User ID=wqwjhdllbiohkkls;Password=wAm8GrVkec54ZpqQbLfupnJXC3u8DPCf75P72rzJYRsokEHVdYqVsfBiZwDN6WNx;";
+        public const string APPHARBOR_DATABASE_CONNECTION = "Server=22868d3a-d013-47a8-9930-a49b015d6de0.sqlserver.sequelizer.com;Database=db22868d3ad01347a89930a49b015d6de0;User ID=wqwjhdllbiohkkls;Password=wAm8GrVkec54ZpqQbLfupnJXC3u8DPCf75P72rzJYRsokEHVdYqVsfBiZwDN6WNx;MultipleActiveResultSets=True;";
         public const string APPHARBOR_HOSTNAME = "22868d3a-d013-47a8-9930-a49b015d6de0.sqlserver.sequelizer.com";
         public const string APPHARBOR_USERNAME = "wqwjhdllbiohkkls";
         public const string APPHARBOR_PASSWORD = "wAm8GrVkec54ZpqQbLfupnJXC3u8DPCf75P72rzJYRsokEHVdYqVsfBiZwDN6WNx";

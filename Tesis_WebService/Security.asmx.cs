@@ -523,7 +523,7 @@ namespace Tesis_WebService
             #region Estableciendo la conexión a BD
             SqlConnection sqlConnection = Conexion();
             #endregion
-            #region Definiendo query de estudiantes asociados
+            #region QueryI - Estudiantes y cursos respectivos
             string query1 = "SELECT S.STUDENTID StudentId, " +
                                    "C.CourseId CourseId " +
                             "FROM REPRESENTATIVES R, " +
@@ -537,88 +537,64 @@ namespace Tesis_WebService
                                  "S.StudentId = SC.Student_StudentId AND " + 
                                  "SC.Course_CourseId = C.CourseId";
             #endregion
-            #region Definiendo query de notificaciones, desde estudiantes
-            string query2 = "SELECT N.Attribution, " + 
-                                   "N.AlertType, " + 
-                                   "N.DateOfCreation, " + 
-                                   "N.SendDate, " + 
-                                   "N.Message, " + 
-                                   "N.Automatic " + 
-                            "FROM NOTIFICATIONS N, " + 
-                                 "SENTNOTIFICATIONS SN " + 
-                            "WHERE N.NotificationId = SN.NotificationId AND " + 
-                                  "SN.Student_StudentId = @StudentId";
+            #region QueryII - Notificaciones por estudiantes/cursos
+            string query2 =
+                "SELECT N.Attribution, " +
+                       "N.AlertType, " +
+                       "CONVERT(DATE, N.DateOfCreation, 110) DateOfCreation, " +
+                       "CONVERT(DATE, N.SendDate, 110) SendDate, " +
+                       "N.Message, " +
+                       "N.Automatic, " +
+                       "N.User_Id UserId " +
+                "FROM NOTIFICATIONS N, " +
+                     "SENTNOTIFICATIONS SN " +
+                "WHERE N.NotificationId = SN.NotificationId AND  " +
+                     "(SN.Student_StudentId = @StudentId OR " +
+                     "SN.Course_CourseId = @CourseId) " +
+                "ORDER BY N.SendDate";
             #endregion
-            #region Definiendo query de notificaciones, desde cursos
-            string query3 = "SELECT N.Attribution, " +
-                                   "N.AlertType, " +
-                                   "N.DateOfCreation, " +
-                                   "N.SendDate, " +
-                                   "N.Message, " +
-                                   "N.Automatic " +
-                            "FROM NOTIFICATIONS N, " +
-                                 "SENTNOTIFICATIONS SN " +
-                            "WHERE N.NotificationId = SN.NotificationId AND " +
-                                  "SN.Course_CourseId = @CourseId";
+            #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
+            string query3 =
+                "SELECT Name User_Name, " + 
+                       "LastName User_LastName " +
+                "FROM AspNetUsers " +
+                "WHERE Id = '@UserId'";
             #endregion
 
             try
             {
-                #region Abriendo la conexión y ejecutando la consulta - QueryI
+                #region Conexión - QueryI
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(query1, sqlConnection);
                 sqlCommand.Parameters.AddWithValue("@UserId", UserId);
                 SqlDataReader reader = sqlCommand.ExecuteReader();
                 #endregion
-                #region Obteniendo la lista de estudiantes y cursos asociados
+                #region Lista de estudiantes & cursos
                 while (reader.Read())
                 {
                     listaEstudiantes.Add(reader["StudentId"].ToString());
                     listaCursos.Add(reader["CourseId"].ToString());
                 }
-                reader.Close();
                 #endregion
-                #region Ciclo por estudiantes
-                foreach (string StudentId in listaEstudiantes)
+                reader.Close();
+
+                /* Nota (28-05-15): El Count() de la lista de estudiantes y la lista de cursos debe ser
+                 * exactamente igual, ya que por cada alumno asociado al representante, se trae el curso 
+                 * asociado a éste. - Rodrigo Uzcátegui. 
+                 */
+                for (int i = 0; i <= listaEstudiantes.Count() - 1; i++ )
                 {
-                    #region Abriendo la conexión y ejecutando la consulta - QueryII
+                    #region Id de estudiante & curso
+                    string StudentId = listaEstudiantes[i];
+                    string CourseId = listaCursos[i];
+                    #endregion
+                    #region Conexión - QueryII
                     sqlCommand = new SqlCommand(query2, sqlConnection);
                     sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
-                    reader = sqlCommand.ExecuteReader();
-                    #endregion
-                    #region Obteniendo la lista de notificaciones asociadas
-                    while (reader.Read())
-                    {
-                        string Attribution = reader["Attribution"].ToString();
-                        string AlertType = reader["AlertType"].ToString();
-                        string DateOfCreation = reader["DateOfCreation"].ToString();
-                        string SendDate = reader["SendDate"].ToString();
-                        string Message = reader["Message"].ToString();
-                        string Automatic = reader["Automatic"].ToString();
-
-                        result.Add(new
-                        {
-                            Attribution = Attribution,
-                            AlertType = AlertType,
-                            DateOfCreation = DateOfCreation,
-                            SendDate = SendDate,
-                            Message = Message,
-                            Automatic = Automatic
-                        });
-                    }
-                    reader.Close();
-                    #endregion
-                }
-                #endregion
-                #region Ciclo por cursos
-                foreach (string CourseId in listaCursos)
-                {
-                    #region Abriendo la conexión y ejecutando la consulta - QueryIII
-                    sqlCommand = new SqlCommand(query3, sqlConnection);
                     sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
                     reader = sqlCommand.ExecuteReader();
                     #endregion
-                    #region Obteniendo la lista de notificaciones asociadas
+                    #region Lista de notificaciones
                     while (reader.Read())
                     {
                         string Attribution = reader["Attribution"].ToString();
@@ -627,6 +603,28 @@ namespace Tesis_WebService
                         string SendDate = reader["SendDate"].ToString();
                         string Message = reader["Message"].ToString();
                         string Automatic = reader["Automatic"].ToString();
+                        string From = "";
+
+                        #region Identificando el emisor
+                        if(Automatic.Equals("True")) //Notificación automática
+                            From = "Notificación Automática";
+                        else
+                        {
+                            string TeacherId = reader["UserId"].ToString();
+
+                            #region Conexión - QueryIII
+                            SqlCommand sqlCommand2 = new SqlCommand(query3, sqlConnection);
+                            sqlCommand2.Parameters.AddWithValue("@UserId", TeacherId);
+                            SqlDataReader reader2 = sqlCommand2.ExecuteReader();
+                            #endregion
+
+                            if (reader2.Read())
+                                From = "Prof. " + reader2["User_Name"].ToString() + " " + 
+                                    reader2["User_LastName"].ToString();
+
+                            reader2.Close();
+                        }
+                        #endregion
 
                         result.Add(new
                         {
@@ -635,13 +633,13 @@ namespace Tesis_WebService
                             DateOfCreation = DateOfCreation,
                             SendDate = SendDate,
                             Message = Message,
-                            Automatic = Automatic
+                            Automatic = Automatic,
+                            From = From
                         });
                     }
-                    reader.Close();
                     #endregion
+                    reader.Close();
                 }
-                #endregion
 
                 return new JavaScriptSerializer().Serialize(result);
             }
