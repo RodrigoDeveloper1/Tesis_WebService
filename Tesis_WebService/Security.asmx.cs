@@ -237,7 +237,8 @@ namespace Tesis_WebService
             string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "", 
                 SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "", 
                 Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "", 
-                PromedioString = "", AssessmentName = "", AssessmentId = "", StudentId = "", StudentName = "";            
+                PromedioString = "", AssessmentName = "", AssessmentId = "", StudentId = "", StudentName = "",
+                School_Address = "", School_Phones = "";
             int Grade = 0, NroEstudiantes = 0;
             double Promedio = 0;
             #endregion
@@ -356,6 +357,10 @@ namespace Tesis_WebService
                         reader["Student_SecondLastName"].ToString() + ", " +
                         reader["Student_FirstName"].ToString() + " " +
                         reader["Student_SecondName"].ToString();
+                    School_Address = reader["School_Address"].ToString();
+                    School_Phones = reader["School_Phone1"].ToString();
+                    if (!reader["School_Phone2"].ToString().Equals(""))
+                        School_Phones += " / " + reader["School_Phone2"].ToString();
                 }
                 #endregion
                 #region Operaciones para queryI/2
@@ -429,7 +434,9 @@ namespace Tesis_WebService
                     Assessment_Name = SubjectName + " - " + AssessmentName,
                     Promedio = PromedioString,
                     StudentId = StudentId,
-                    StudentName = StudentName
+                    StudentName = StudentName,
+                    School_Address = School_Address,
+                    School_Phones = School_Phones
                 };
                 #endregion
 
