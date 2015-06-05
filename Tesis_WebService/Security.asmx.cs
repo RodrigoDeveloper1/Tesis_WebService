@@ -75,7 +75,8 @@ namespace Tesis_WebService
                       "CASU.CourseId = C.CourseId AND " +
                       "CASU.PeriodId = @PeriodId AND " +
                       "CASU.SubjectId = SU.SubjectId AND " +
-                      "CASU.TeacherId = U.Id";
+                      "CASU.TeacherId = U.Id " + 
+                "ORDER BY SU.Name";
             #endregion
             #region Definiendo el query II - Nro de estudiantes por curso
             string queryII = "SELECT COUNT(SC.Student_StudentId) NroAlumnos " +
@@ -236,7 +237,7 @@ namespace Tesis_WebService
             string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "", 
                 SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "", 
                 Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "", 
-                PromedioString = "", AssessmentName = "", AssessmentId = "";
+                PromedioString = "", AssessmentName = "", AssessmentId = "", StudentId = "", StudentName = "";            
             int Grade = 0, NroEstudiantes = 0;
             double Promedio = 0;
             #endregion
@@ -262,6 +263,11 @@ namespace Tesis_WebService
                         "R.LastName Representative_LastName, " +
                         "C.Name CourseName, " +
                         "C.CourseId CourseId, " +
+                        "S.StudentId StudentId, " +
+                        "S.FirstLastName Student_FirstLastName, " +
+                        "S.SecondLastName Student_SecondLastName, " +
+                        "S.FirstName Student_FirstName, " +
+                        "S.SecondName Student_SecondName, " +
                         "C.Grade Grade " +
                 "FROM REPRESENTATIVES R, " +
                      "REPRESENTATIVESTUDENTS RS, " +
@@ -345,6 +351,11 @@ namespace Tesis_WebService
                     Course_Name = reader["CourseName"].ToString();
                     CourseId = reader["CourseId"].ToString();
                     Grade = Convert.ToInt32(reader["Grade"].ToString());
+                    StudentId = reader["StudentId"].ToString();
+                    StudentName = reader["Student_FirstLastName"].ToString() + " " + 
+                        reader["Student_SecondLastName"].ToString() + ", " +
+                        reader["Student_FirstName"].ToString() + " " +
+                        reader["Student_SecondName"].ToString();
                 }
                 #endregion
                 #region Operaciones para queryI/2
@@ -416,7 +427,9 @@ namespace Tesis_WebService
                     Representative_LastName = Representative_LastName,
                     Course_Name = Course_Name,
                     Assessment_Name = SubjectName + " - " + AssessmentName,
-                    Promedio = PromedioString
+                    Promedio = PromedioString,
+                    StudentId = StudentId,
+                    StudentName = StudentName
                 };
                 #endregion
 
