@@ -43,78 +43,81 @@ namespace Tesis_WebService
         {
             #region Declarando variables
             object result;
+            SqlConnection sqlConnection = null;
             string CourseId = "", CourseName = "", CourseSection = "", Materias = "", SubjectName = "", 
                 AssessmentName = "", AssessmentId = "", PromedioString = "";
             int CourseGrade = 0, NroAlumnos = 0;
             double Promedio = 0;
             bool SiHayData = false;
             #endregion
-            #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = Conexion();
-            #endregion
-            #region Definiendo el query I
-            string queryI =
-                "SELECT C.CourseId CourseId, " +
-                       "C.Name CourseName, " +
-                       "C.Grade CourseGrade, " +
-                       "C.Section CourseSection, " +
-                       "SU.SubjectId SubjectId, " +
-                       "SU.Name SubjectName, " +
-                       "SU.SubjectCode SubjectCode, " +
-                       "U.Name UserName, " +
-                       "U.LastName UserLastName " +
-                "FROM STUDENTS S, " +
-                     "StudentCourses SC, " +
-                     "COURSES C, " +
-                     "CASUS CASU, " +
-                     "SUBJECTS SU, " +
-                     "ASPNETUSERS U " +
-                "WHERE S.StudentId = @StudentId AND " +
-                      "SC.Student_StudentId = S.StudentId AND " +
-                      "SC.Course_CourseId = C.CourseId AND " +
-                      "CASU.CourseId = C.CourseId AND " +
-                      "CASU.PeriodId = @PeriodId AND " +
-                      "CASU.SubjectId = SU.SubjectId AND " +
-                      "CASU.TeacherId = U.Id " + 
-                "ORDER BY SU.Name";
-            #endregion
-            #region Definiendo el query II - Nro de estudiantes por curso
-            string queryII = "SELECT COUNT(SC.Student_StudentId) NroAlumnos " +
-                             "FROM COURSES C, " +
-                                  "StudentCourses SC " +
-                             "WHERE C.CourseId = @CourseId AND " +
-                                   "C.CourseId = SC.Course_CourseId";
-            #endregion
-            #region Definiendo el query III - Última evaluación por curso
-            string queryIII =
-                "SELECT TOP(1) " +
-                    "A.[Name] AssessmentName, " +
-                    "A.AssessmentId AssessmentId, " +
-                    "SUB.[Name] SubjectName " +
-                "FROM Assessments A, " +
-                     "Courses C, " +
-                     "CASUs CASU, " +
-                     "Subjects SUB " +
-                "WHERE A.CASU_CourseId = CASU.CourseId AND " +
-                      "A.CASU_PeriodId = CASU.PeriodId AND " +
-                      "A.CASU_SubjectId = CASU.SubjectId AND " +
-                      "CASU.CourseId = C.CourseId AND " +
-                      "C.CourseId = @CourseId AND " +
-                      "CASU.SubjectId = SUB.SubjectId " +
-                "ORDER BY A.FinishDate, A.EndHour";
-            #endregion
-            #region Definiendo el query IV - Promedio de la última evaluación
-            string queryIV =
-                "SELECT S.NumberScore, " +
-                       "S.LetterScore " +
-                "FROM Assessments A, " +
-                     "Scores S " +
-                "WHERE A.AssessmentId = @AssessmentId AND " +
-                      "A.AssessmentId = S.AssessmentId";
-            #endregion
 
+            #region Try
             try
             {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el query I
+                string queryI =
+                    "SELECT C.CourseId CourseId, " +
+                           "C.Name CourseName, " +
+                           "C.Grade CourseGrade, " +
+                           "C.Section CourseSection, " +
+                           "SU.SubjectId SubjectId, " +
+                           "SU.Name SubjectName, " +
+                           "SU.SubjectCode SubjectCode, " +
+                           "U.Name UserName, " +
+                           "U.LastName UserLastName " +
+                    "FROM STUDENTS S, " +
+                         "StudentCourses SC, " +
+                         "COURSES C, " +
+                         "CASUS CASU, " +
+                         "SUBJECTS SU, " +
+                         "ASPNETUSERS U " +
+                    "WHERE S.StudentId = @StudentId AND " +
+                          "SC.Student_StudentId = S.StudentId AND " +
+                          "SC.Course_CourseId = C.CourseId AND " +
+                          "CASU.CourseId = C.CourseId AND " +
+                          "CASU.PeriodId = @PeriodId AND " +
+                          "CASU.SubjectId = SU.SubjectId AND " +
+                          "CASU.TeacherId = U.Id " +
+                    "ORDER BY SU.Name";
+                #endregion
+                #region Definiendo el query II - Nro de estudiantes por curso
+                string queryII = "SELECT COUNT(SC.Student_StudentId) NroAlumnos " +
+                                 "FROM COURSES C, " +
+                                      "StudentCourses SC " +
+                                 "WHERE C.CourseId = @CourseId AND " +
+                                       "C.CourseId = SC.Course_CourseId";
+                #endregion
+                #region Definiendo el query III - Última evaluación por curso
+                string queryIII =
+                    "SELECT TOP(1) " +
+                        "A.[Name] AssessmentName, " +
+                        "A.AssessmentId AssessmentId, " +
+                        "SUB.[Name] SubjectName " +
+                    "FROM Assessments A, " +
+                         "Courses C, " +
+                         "CASUs CASU, " +
+                         "Subjects SUB " +
+                    "WHERE A.CASU_CourseId = CASU.CourseId AND " +
+                          "A.CASU_PeriodId = CASU.PeriodId AND " +
+                          "A.CASU_SubjectId = CASU.SubjectId AND " +
+                          "CASU.CourseId = C.CourseId AND " +
+                          "C.CourseId = @CourseId AND " +
+                          "CASU.SubjectId = SUB.SubjectId " +
+                    "ORDER BY A.FinishDate, A.EndHour";
+                #endregion
+                #region Definiendo el query IV - Promedio de la última evaluación
+                string queryIV =
+                    "SELECT S.NumberScore, " +
+                           "S.LetterScore " +
+                    "FROM Assessments A, " +
+                         "Scores S " +
+                    "WHERE A.AssessmentId = @AssessmentId AND " +
+                          "A.AssessmentId = S.AssessmentId";
+                #endregion
+
                 #region Operaciones para query I
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
@@ -207,25 +210,26 @@ namespace Tesis_WebService
                     Assessment_Name = SubjectName + " - " + AssessmentName,
                     Promedio = PromedioString
                 };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
-            #region Catch de los errores
+            #endregion
+            #region Catch
             catch (SqlException e)
             {
-                sqlConnection.Close();
                 result = new { Success = false, Exception = e.Message };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             catch (Exception e)
             {
-                sqlConnection.Close();
                 result = new { Success = false, Exception = e.Message };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]
@@ -234,102 +238,106 @@ namespace Tesis_WebService
         {
             #region Declaración de variables
             object result = null;
-            string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "", 
-                SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "", 
-                Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "", 
-                PromedioString = "", AssessmentName = "", AssessmentId = "", StudentId = "", StudentName = "",
-                School_Address = "", School_Phones = "";
+            SqlConnection sqlConnection = null;
+
+            string SchoolId = "", School_Name = "", SchoolYearId = "", SchoolYear_StartDate = "",
+                    SchoolYear_EndDate = "", PeriodId = "", Period_Name = "", Representative_Name = "",
+                    Representative_LastName = "", Course_Name = "", CourseId = "", SubjectName = "",
+                    PromedioString = "", AssessmentName = "", AssessmentId = "", StudentId = "", 
+                    StudentName = "", School_Address = "", School_Phones = "";
             int Grade = 0, NroEstudiantes = 0;
             double Promedio = 0;
             #endregion
-            #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = Conexion();
-            #endregion
-            #region Definiendo el query
-            string query =
-                "SELECT TOP(1) " +
-                        "SCH.SchoolId SchoolId, " +
-                        "SCH.Name School_Name, " +
-                        "SCH.Address School_Address, " +
-                        "SCH.Phone1 School_Phone1, " +
-                        "SCH.Phone2 School_Phone2, " +
-                        "SY.SchoolYearId SchoolYearId, " +
-                        "CONVERT(DATE, SY.StartDate, 103) SchoolYear_StartDate, " +
-                        "CONVERT(DATE, SY.EndDate, 103) SchoolYear_EndDate, " +
-                        "P.PeriodId PeriodId, " +
-                        "P.Name Period_Name, " +
-                        "CONVERT(DATE, P.StartDate, 103) Period_StartDate, " +
-                        "CONVERT(DATE, P.FinishDate, 103) Period_FinishDate, " +
-                        "R.Name Representative_Name, " +
-                        "R.LastName Representative_LastName, " +
-                        "C.Name CourseName, " +
-                        "C.CourseId CourseId, " +
-                        "S.StudentId StudentId, " +
-                        "S.FirstLastName Student_FirstLastName, " +
-                        "S.SecondLastName Student_SecondLastName, " +
-                        "S.FirstName Student_FirstName, " +
-                        "S.SecondName Student_SecondName, " +
-                        "C.Grade Grade " +
-                "FROM REPRESENTATIVES R, " +
-                     "REPRESENTATIVESTUDENTS RS, " +
-                     "STUDENTS S, " +
-                     "STUDENTCOURSES SC, " +
-                     "COURSES C, " +
-                     "CASUS CASU, " +
-                     "PERIODS P, " +
-                     "SCHOOLYEARS SY, " +
-                     "SCHOOLS SCH " +
-                "WHERE R.RepresentativeId = @UserId AND " +
-                      "RS.Representative_RepresentativeId = R.RepresentativeId AND " +
-                      "S.StudentId = RS.Student_StudentId AND " +
-                      "S.StudentId = SC.Student_StudentId AND " +
-                      "SC.Course_CourseId = C.CourseId AND " +
-                      "C.CourseId = CASU.CourseId AND " +
-                      "CASU.PeriodId = P.PeriodId AND " +
-                      "P.SchoolYear_SchoolYearId = SY.SchoolYearId AND " +
-                      "SY.School_SchoolId = SCH.SchoolId AND " +
-                      "CAST(P.StartDate AS DATE) <= CAST(GETDATE() AS DATE) AND " +
-                      "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE)";
-            /*Este query no incluye obtener información después de la fecha de finalización del último lapso*/
-            #endregion
-            #region Definiendo el query I/2 - Nro de estudiantes por curso
-            string queryI2 =
-                "SELECT COUNT(SC.Student_StudentId) NroEstudiantes " +
-                             "FROM COURSES C, " +
-                                  "StudentCourses SC " +
-                             "WHERE C.CourseId = @CourseId AND " +
-                                   "C.CourseId = SC.Course_CourseId";
-            #endregion
-            #region Definiendo el query II - Última evaluación por curso
-            string queryII = 
-                "SELECT TOP(1) " +
-                    "A.[Name] AssessmentName, " + 
-                    "A.AssessmentId AssessmentId, " +
-                    "SUB.[Name] SubjectName " + 
-                "FROM Assessments A, " +                      
-                     "Courses C, " + 
-                     "CASUs CASU, " + 
-                     "Subjects SUB " +
-                "WHERE A.CASU_CourseId = CASU.CourseId AND " +
-                      "A.CASU_PeriodId = CASU.PeriodId AND " + 
-                      "A.CASU_SubjectId = CASU.SubjectId AND " + 
-                      "CASU.CourseId = C.CourseId AND " + 
-                      "C.CourseId = @CourseId AND " + 
-                      "CASU.SubjectId = SUB.SubjectId " + 
-                "ORDER BY A.FinishDate, A.EndHour";
-            #endregion
-            #region Definiendo el query III - Promedio de la última evaluación
-            string queryIII =
-                "SELECT S.NumberScore, " +
-                       "S.LetterScore " +
-                "FROM Assessments A, " +
-                     "Scores S " +
-                "WHERE A.AssessmentId = @AssessmentId AND " +
-                      "A.AssessmentId = S.AssessmentId";
-            #endregion
 
+            #region Try
             try
             {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el query
+                string query =
+                    "SELECT TOP(1) " +
+                            "SCH.SchoolId SchoolId, " +
+                            "SCH.Name School_Name, " +
+                            "SCH.Address School_Address, " +
+                            "SCH.Phone1 School_Phone1, " +
+                            "SCH.Phone2 School_Phone2, " +
+                            "SY.SchoolYearId SchoolYearId, " +
+                            "CONVERT(DATE, SY.StartDate, 103) SchoolYear_StartDate, " +
+                            "CONVERT(DATE, SY.EndDate, 103) SchoolYear_EndDate, " +
+                            "P.PeriodId PeriodId, " +
+                            "P.Name Period_Name, " +
+                            "CONVERT(DATE, P.StartDate, 103) Period_StartDate, " +
+                            "CONVERT(DATE, P.FinishDate, 103) Period_FinishDate, " +
+                            "R.Name Representative_Name, " +
+                            "R.LastName Representative_LastName, " +
+                            "C.Name CourseName, " +
+                            "C.CourseId CourseId, " +
+                            "S.StudentId StudentId, " +
+                            "S.FirstLastName Student_FirstLastName, " +
+                            "S.SecondLastName Student_SecondLastName, " +
+                            "S.FirstName Student_FirstName, " +
+                            "S.SecondName Student_SecondName, " +
+                            "C.Grade Grade " +
+                    "FROM REPRESENTATIVES R, " +
+                         "REPRESENTATIVESTUDENTS RS, " +
+                         "STUDENTS S, " +
+                         "STUDENTCOURSES SC, " +
+                         "COURSES C, " +
+                         "CASUS CASU, " +
+                         "PERIODS P, " +
+                         "SCHOOLYEARS SY, " +
+                         "SCHOOLS SCH " +
+                    "WHERE R.RepresentativeId = @UserId AND " +
+                          "RS.Representative_RepresentativeId = R.RepresentativeId AND " +
+                          "S.StudentId = RS.Student_StudentId AND " +
+                          "S.StudentId = SC.Student_StudentId AND " +
+                          "SC.Course_CourseId = C.CourseId AND " +
+                          "C.CourseId = CASU.CourseId AND " +
+                          "CASU.PeriodId = P.PeriodId AND " +
+                          "P.SchoolYear_SchoolYearId = SY.SchoolYearId AND " +
+                          "SY.School_SchoolId = SCH.SchoolId AND " +
+                          "CAST(P.StartDate AS DATE) <= CAST(GETDATE() AS DATE) AND " +
+                          "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE)";
+                /*Este query no incluye obtener información después de la fecha de finalización del último lapso*/
+                #endregion
+                #region Definiendo el query I/2 - Nro de estudiantes por curso
+                string queryI2 =
+                    "SELECT COUNT(SC.Student_StudentId) NroEstudiantes " +
+                                 "FROM COURSES C, " +
+                                      "StudentCourses SC " +
+                                 "WHERE C.CourseId = @CourseId AND " +
+                                       "C.CourseId = SC.Course_CourseId";
+                #endregion
+                #region Definiendo el query II - Última evaluación por curso
+                string queryII =
+                    "SELECT TOP(1) " +
+                        "A.[Name] AssessmentName, " +
+                        "A.AssessmentId AssessmentId, " +
+                        "SUB.[Name] SubjectName " +
+                    "FROM Assessments A, " +
+                         "Courses C, " +
+                         "CASUs CASU, " +
+                         "Subjects SUB " +
+                    "WHERE A.CASU_CourseId = CASU.CourseId AND " +
+                          "A.CASU_PeriodId = CASU.PeriodId AND " +
+                          "A.CASU_SubjectId = CASU.SubjectId AND " +
+                          "CASU.CourseId = C.CourseId AND " +
+                          "C.CourseId = @CourseId AND " +
+                          "CASU.SubjectId = SUB.SubjectId " +
+                    "ORDER BY A.FinishDate, A.EndHour";
+                #endregion
+                #region Definiendo el query III - Promedio de la última evaluación
+                string queryIII =
+                    "SELECT S.NumberScore, " +
+                           "S.LetterScore " +
+                    "FROM Assessments A, " +
+                         "Scores S " +
+                    "WHERE A.AssessmentId = @AssessmentId AND " +
+                          "A.AssessmentId = S.AssessmentId";
+                #endregion
+
                 #region Operaciones para queryI
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
@@ -441,47 +449,50 @@ namespace Tesis_WebService
                 #endregion
 
                 reader.Close();
-                sqlConnection.Close();
-
-                return new JavaScriptSerializer().Serialize(result);
             }
-            #region Catch de los errores
+            #endregion
+            #region Catch
             catch (SqlException e)
             {
-                sqlConnection.Close();
                 result = new { Success = false, Exception = e.Message };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             catch (Exception e)
             {
-                sqlConnection.Close();
                 result = new { Success = false, Exception = e.Message };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string Login(string Username, string Password)
         {
-            #region Declarando la variable de resultado
+            #region Declaración de variables
             object result;
-            #endregion
-            #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = Conexion();
-            #endregion
-            #region Definiendo el query
-            string query =
-                "SELECT PASSWORDHASH, REPRESENTATIVEID " + 
-                "FROM REPRESENTATIVES " +
-                "WHERE EMAIL = @username";
+            SqlConnection sqlConnection = null;
             #endregion
 
+            #region Try
             try
             {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el query
+                string query =
+                    "SELECT PASSWORDHASH, REPRESENTATIVEID " +
+                    "FROM REPRESENTATIVES " +
+                    "WHERE EMAIL = @username";
+                #endregion
+
                 #region Abriendo la conexión y ejecutando la consulta
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
@@ -494,7 +505,6 @@ namespace Tesis_WebService
                 {
                     string PasswordHash = reader["PASSWORDHASH"].ToString();                    
                     string UserId = reader["REPRESENTATIVEID"].ToString();
-                    sqlConnection.Close();
 
                     bool valor = Logic.PasswordHash(Password, PasswordHash);
 
@@ -502,36 +512,32 @@ namespace Tesis_WebService
                         result = new { Success = valor, UserId = UserId };
                     else
                         result = new { Success = false, Exception = "Contraseña incorrecta." };
-
-                    return new JavaScriptSerializer().Serialize(result);
                 }
                 #endregion
                 #region No hay data
                 else
-                {
-                    sqlConnection.Close();
                     result = new { Success = false, Exception = "Nombre de usuario incorrecto." };
-
-                    return new JavaScriptSerializer().Serialize(result);
-                }
                 #endregion
             }
-            #region Catch de los errores
+            #endregion
+            #region Catch
             catch (SqlException e)
             {
-                sqlConnection.Close();
                 result = new { Success = false, Exception = e.Message };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             catch(Exception e)
             {
-                sqlConnection.Close();
                 result = new { Success = false, Exception = e.Message };
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             #endregion
+            #region Finally
+            finally 
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]
@@ -542,50 +548,53 @@ namespace Tesis_WebService
             List<object> result = new List<object>();
             List<string> listaEstudiantes = new List<string>();
             List<string> listaCursos = new List<string>();
+            SqlConnection sqlConnection = null;
             #endregion
-            #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = Conexion();
-            #endregion
-            #region QueryI - Estudiantes y cursos respectivos
-            string query1 = "SELECT S.STUDENTID StudentId, " +
-                                   "C.CourseId CourseId " +
-                            "FROM REPRESENTATIVES R, " +
-                                 "REPRESENTATIVESTUDENTS RS, " +
-                                 "STUDENTS S, " +
-                                 "STUDENTCOURSES SC, " +
-                                 "COURSES C " +
-                           "WHERE R.RepresentativeId = @UserId AND " +
-                                 "R.RepresentativeId = RS.Representative_RepresentativeId AND " +
-                                 "RS.Student_StudentId = S.StudentId AND " + 
-                                 "S.StudentId = SC.Student_StudentId AND " + 
-                                 "SC.Course_CourseId = C.CourseId";
-            #endregion
-            #region QueryII - Notificaciones por estudiantes/cursos
-            string query2 =
-                "SELECT N.Attribution, " +
-                       "N.AlertType, " +
-                       "CONVERT(DATE, N.DateOfCreation, 110) DateOfCreation, " +
-                       "CONVERT(DATE, N.SendDate, 110) SendDate, " +
-                       "N.Message, " +
-                       "N.Automatic, " +
-                       "N.User_Id UserId " +
-                "FROM NOTIFICATIONS N, " +
-                     "SENTNOTIFICATIONS SN " +
-                "WHERE N.NotificationId = SN.NotificationId AND  " +
-                     "(SN.Student_StudentId = @StudentId OR " +
-                     "SN.Course_CourseId = @CourseId) " +
-                "ORDER BY N.SendDate";
-            #endregion
-            #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
-            string query3 =
-                "SELECT Name User_Name, " + 
-                       "LastName User_LastName " +
-                "FROM AspNetUsers " +
-                "WHERE Id = '@UserId'";
-            #endregion
-
+            
+            #region Try
             try
             {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region QueryI - Estudiantes y cursos respectivos
+                string query1 = "SELECT S.STUDENTID StudentId, " +
+                                       "C.CourseId CourseId " +
+                                "FROM REPRESENTATIVES R, " +
+                                     "REPRESENTATIVESTUDENTS RS, " +
+                                     "STUDENTS S, " +
+                                     "STUDENTCOURSES SC, " +
+                                     "COURSES C " +
+                               "WHERE R.RepresentativeId = @UserId AND " +
+                                     "R.RepresentativeId = RS.Representative_RepresentativeId AND " +
+                                     "RS.Student_StudentId = S.StudentId AND " +
+                                     "S.StudentId = SC.Student_StudentId AND " +
+                                     "SC.Course_CourseId = C.CourseId";
+                #endregion
+                #region QueryII - Notificaciones por estudiantes/cursos
+                string query2 =
+                    "SELECT N.Attribution, " +
+                           "N.AlertType, " +
+                           "CONVERT(DATE, N.DateOfCreation, 110) DateOfCreation, " +
+                           "CONVERT(DATE, N.SendDate, 110) SendDate, " +
+                           "N.Message, " +
+                           "N.Automatic, " +
+                           "N.User_Id UserId " +
+                    "FROM NOTIFICATIONS N, " +
+                         "SENTNOTIFICATIONS SN " +
+                    "WHERE N.NotificationId = SN.NotificationId AND  " +
+                         "(SN.Student_StudentId = @StudentId OR " +
+                         "SN.Course_CourseId = @CourseId) " +
+                    "ORDER BY N.SendDate";
+                #endregion
+                #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
+                string query3 =
+                    "SELECT Name User_Name, " +
+                           "LastName User_LastName " +
+                    "FROM AspNetUsers " +
+                    "WHERE Id = '@UserId'";
+                #endregion
+
                 #region Conexión - QueryI
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(query1, sqlConnection);
@@ -663,47 +672,49 @@ namespace Tesis_WebService
                     #endregion
                     reader.Close();
                 }
-
-                return new JavaScriptSerializer().Serialize(result);
             }
-            #region Catch de los errores
+            #endregion
+            #region Catch
             catch (SqlException e)
             {
-                sqlConnection.Close();
                 result.Add(new { Success = false, Exception = e.Message });
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             catch (Exception e)
             {
-                sqlConnection.Close();
                 result.Add(new { Success = false, Exception = e.Message });
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string Statistics(string SchoolId, string SchoolYearId, string CourseId)
         {
-            #region Declaración de la variable resultado
+            #region Declaración de variables
             List<object> result = new List<object>();
-            #endregion
+
             #region Configurando la ruta de las imágenes
             string path = ConstantsRepository.STATISTICS_IMAGES_PATH_APP_UPLOADS;
             path += @"\School_" + SchoolId + @"\SchoolYear_" + SchoolYearId + @"\";
 
-            string imgPath1 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
-                ConstantsRepository.STATISTICS_IMG_1;            
-            string imgPath2 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" + 
+            string imgPath1 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
+                ConstantsRepository.STATISTICS_IMG_1;
+            string imgPath2 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
                 ConstantsRepository.STATISTICS_IMG_2;
 
             imgPath1 = Path.Combine(Server.MapPath(path), imgPath1);
             imgPath2 = Path.Combine(Server.MapPath(path), imgPath2);
             #endregion
-
+            #endregion
+            
             try
             {
                 #region Obteniendo imágenes desde rutas
@@ -739,20 +750,24 @@ namespace Tesis_WebService
                     Image = imageBase64_2
                 });
                 #endregion
-
-                return new JavaScriptSerializer().Serialize(result);
             }
-            #region Catch del error
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
             catch (Exception e)
             {
-                result.Add(new
-                {
-                    Success = false,
-                    Exception = e.Message
-                });
-                return new JavaScriptSerializer().Serialize(result);
+                result.Add(new { Success = false, Exception = e.Message });
             }
             #endregion
+            #region Finally
+            finally
+            {
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]
@@ -761,28 +776,30 @@ namespace Tesis_WebService
         {
             #region Declarando la variable de resultado
             List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
             #endregion
-            #region Estableciendo la conexión a BD
-            SqlConnection sqlConnection = Conexion();
-            #endregion
-            #region Definiendo el query
-            string query =
-                "SELECT S.* " +
-                "FROM STUDENTS S, " +
-                     "RepresentativeStudents RS, " +
-                     "Representatives R, " +
-                     "StudentCourses SC, " +
-                     "Courses C " +
-                "WHERE S.StudentId = RS.Student_StudentId AND " +
-                      "RS.Representative_RepresentativeId = R.RepresentativeId AND " +
-                      "R.RepresentativeId = @UserId AND " +
-                      "S.StudentId = SC.Student_StudentId AND " +
-                      "SC.Course_CourseId = C.CourseId " +
-                "ORDER BY C.Grade DESC";
-            #endregion
-
+            
             try
             {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el query
+                string query =
+                    "SELECT S.* " +
+                    "FROM STUDENTS S, " +
+                         "RepresentativeStudents RS, " +
+                         "Representatives R, " +
+                         "StudentCourses SC, " +
+                         "Courses C " +
+                    "WHERE S.StudentId = RS.Student_StudentId AND " +
+                          "RS.Representative_RepresentativeId = R.RepresentativeId AND " +
+                          "R.RepresentativeId = @UserId AND " +
+                          "S.StudentId = SC.Student_StudentId AND " +
+                          "SC.Course_CourseId = C.CourseId " +
+                    "ORDER BY C.Grade DESC";
+                #endregion
+
                 #region Abriendo la conexión y ejecutando la consulta
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
@@ -808,25 +825,25 @@ namespace Tesis_WebService
                     });
                 }
                 #endregion
-
-                return new JavaScriptSerializer().Serialize(result);
             }
-            #region Catch de los errores
+            #region Catch
             catch (SqlException e)
             {
-                sqlConnection.Close();
                 result.Add(new { Success = false, Exception = e.Message });
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             catch (Exception e)
             {
-                sqlConnection.Close();
                 result.Add(new { Success = false, Exception = e.Message });
-
-                return new JavaScriptSerializer().Serialize(result);
             }
             #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
         }
     }
 }
