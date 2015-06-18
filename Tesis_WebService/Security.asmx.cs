@@ -39,6 +39,200 @@ namespace Tesis_WebService
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string Assessments(string StudentId, string CourseId, string SubjectId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
+
+            string Assessment = "", 
+                   Score = "", 
+                   Period = "", 
+                   DefinitivaString = "";
+
+            int Grade = 0, 
+                Percentage = 0,
+                contadorI = 0,
+                contadorII = 0,
+                contadorIII = 0;
+
+            double calculoI = 0,
+                   calculoII = 0,
+                   calculoIII = 0,
+                   definitiva = 0;
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el query I
+                string queryI =
+                    "SELECT A.Name AssessmentName, " +
+                           "A.Percentage AssessmentPercentage, " +
+                           "S.NumberScore, " +
+                           "S.LetterScore, " +
+                           "P.Name Period, " +
+                           "C.Grade "+
+                    "FROM Assessments A, " +
+                         "Scores S, " +
+                         "Students St, " +
+                         "Periods P, " +
+                         "Courses C " +
+                    "WHERE A.CASU_CourseId = @CourseId AND " +
+                          "A.CASU_SubjectId = @SubjectId AND " +
+                          "St.StudentId = @StudentId AND " +
+                          "A.AssessmentId = S.AssessmentId AND " +
+                          "S.StudentId = St.StudentId AND " +
+                          "A.CASU_PeriodId = P.PeriodId AND " +
+                          "A.CASU_CourseId = C.CourseId";
+                #endregion
+
+                #region Operaciones para query I
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
+                sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                sqlCommand.Parameters.AddWithValue("@SubjectId", SubjectId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Grade = Convert.ToInt32(reader["Grade"].ToString());
+                    Percentage = Convert.ToInt32(reader["AssessmentPercentage"].ToString());
+
+                    Assessment = reader["AssessmentName"].ToString();
+                    Score = (Grade > 6 ? reader["NumberScore"].ToString() :
+                        reader["LetterScore"].ToString());
+                    Period = reader["Period"].ToString();
+
+                    result.Add(new
+                    {
+                        Assessment = Assessment,
+                        Score = Score,
+                        Period = Period
+                    });
+
+                    #region Cálculos para definitiva
+                    #region Cálculos del 1er Lapso
+                    if (Period.Equals("1er Lapso"))
+                    {
+                        #region Bachillerato
+                        if (Grade > 6) //Bachillerato
+                            calculoI += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        #endregion
+                        #region Primaria
+                        else //Primaria
+                        {
+                            if (Score.Equals("A")) calculoI += 5;
+                            else if (Score.Equals("B")) calculoI += 4;
+                            else if (Score.Equals("C")) calculoI += 3;
+                            else if (Score.Equals("D")) calculoI += 2;
+                            else if (Score.Equals("E")) calculoI += 1;
+
+                            contadorI++;
+                        }
+                        #endregion
+                    }
+                    #endregion
+                    #region Cálculos del 2do Lapso
+                    else if (Period.Equals("2do Lapso"))
+                    {
+                        #region Bachillerato
+                        if (Grade > 6) //Bachillerato
+                            calculoII += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        #endregion
+                        #region Primaria
+                        else //Primaria
+                        {
+                            if (Score.Equals("A")) calculoII += 5;
+                            else if (Score.Equals("B")) calculoII += 4;
+                            else if (Score.Equals("C")) calculoII += 3;
+                            else if (Score.Equals("D")) calculoII += 2;
+                            else if (Score.Equals("E")) calculoII += 1;
+
+                            contadorII++;
+                        }
+                        #endregion
+                    }
+                    #endregion
+                    #region Cálculos del 3er Lapso
+                    else if (Period.Equals("3er Lapso"))
+                    {
+                        #region Bachillerato
+                        if (Grade > 6) //Bachillerato
+                            calculoIII += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        #endregion
+                        #region Primaria
+                        else //Primaria
+                        {
+                            if (Score.Equals("A")) calculoIII += 5;
+                            else if (Score.Equals("B")) calculoIII += 4;
+                            else if (Score.Equals("C")) calculoIII += 3;
+                            else if (Score.Equals("D")) calculoIII += 2;
+                            else if (Score.Equals("E")) calculoIII += 1;
+
+                            contadorIII++;
+                        }
+                        #endregion
+                    }
+                    #endregion
+                    #endregion
+                }
+                reader.Close();
+
+                #region Cálculo definitiva
+                #region Bachillerato
+                if (Grade > 6) //Bachillerato
+                {
+                    definitiva = Math.Round((double)(calculoI + calculoII + calculoIII) / 3, 2);
+                    result.Add(new { Definitiva = definitiva });
+                }
+                #endregion
+                #region Primaria
+                else //Primaria
+                {
+                    definitiva = Math.Round((double)(((double)calculoI / contadorI) +
+                                           ((double)calculoII / contadorII) +
+                                           ((double)calculoIII / contadorIII)) / 3);
+
+                    if (definitiva == 1) DefinitivaString = "A";
+                    else if (definitiva == 2) DefinitivaString = "B";
+                    else if (definitiva == 3) DefinitivaString = "C";
+                    else if (definitiva == 4) DefinitivaString = "D";
+                    else if (definitiva == 5) DefinitivaString = "E";
+
+                    result.Add(new { Definitiva = DefinitivaString });
+                }
+                #endregion
+                #endregion
+                #endregion
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string CourseInfo(string StudentId, string PeriodId)
         {
             #region Declarando variables
