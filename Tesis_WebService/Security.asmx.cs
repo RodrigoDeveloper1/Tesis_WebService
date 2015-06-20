@@ -326,7 +326,8 @@ namespace Tesis_WebService
                     CourseName = reader["CourseName"].ToString();
                     CourseGrade = Convert.ToInt32(reader["CourseGrade"].ToString());
                     CourseSection = reader["CourseSection"].ToString();
-                    Materias += reader["SubjectId"].ToString() + ":" + 
+                    Materias += ":" + 
+                                reader["SubjectId"].ToString() + ":" + 
                                 reader["SubjectName"].ToString() + " (" +
                                 reader["UserName"].ToString() + " " +
                                 reader["UserLastName"].ToString() + ")_";
