@@ -44,6 +44,7 @@ namespace Tesis_WebService
             #region Declarando variables
             List<object> result = new List<object>();
             SqlConnection sqlConnection = null;
+            Dictionary<int, string> listaNotas = new Dictionary<int, string>();
 
             string Assessment = "", 
                    Score = "", 
@@ -54,7 +55,8 @@ namespace Tesis_WebService
                 Percentage = 0,
                 contadorI = 0,
                 contadorII = 0,
-                contadorIII = 0;
+                contadorIII = 0,
+                AssessmentId = 0;
 
             double calculoI = 0,
                    calculoII = 0,
@@ -68,9 +70,10 @@ namespace Tesis_WebService
                 #region Estableciendo la conexión a BD
                 sqlConnection = Conexion();
                 #endregion
-                #region Definiendo el query I
+                #region Definiendo el query I - Evaluaciones con notas del estudiante
                 string queryI =
                     "SELECT A.Name AssessmentName, " +
+                           "A.AssessmentId, " +
                            "A.Percentage AssessmentPercentage, " +
                            "S.NumberScore, " +
                            "S.LetterScore, " +
@@ -89,7 +92,22 @@ namespace Tesis_WebService
                           "A.CASU_PeriodId = P.PeriodId AND " +
                           "A.CASU_CourseId = C.CourseId";
                 #endregion
-
+                #region Definiendo el query II - La lista de todas las evaluaciones respectivas
+                string queryII = 
+                    "SELECT A.Name AssessmentName, " +
+                        "A.AssessmentId, " +
+                        "A.Percentage AssessmentPercentage, " +
+                        "C.Grade, " +
+                        "P.Name Period " +
+                    "FROM Assessments A, " +
+                         "Courses C, " +
+                         "Periods P " +
+                    "WHERE A.CASU_CourseId =  @CourseId AND " +
+                          "A.CASU_SubjectId = @SubjectId AND " +
+                          "A.CASU_CourseId = C.CourseId AND " + 
+                          "A.CASU_PeriodId = P.PeriodId";
+                #endregion
+                                
                 #region Operaciones para query I
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
@@ -101,12 +119,29 @@ namespace Tesis_WebService
                 while (reader.Read())
                 {
                     Grade = Convert.ToInt32(reader["Grade"].ToString());
-                    Percentage = Convert.ToInt32(reader["AssessmentPercentage"].ToString());
+                    AssessmentId = Convert.ToInt32(reader["AssessmentId"].ToString());
+                    Score = (Grade > 6 ? reader["NumberScore"].ToString() : reader["LetterScore"].ToString());                    
 
-                    Assessment = reader["AssessmentName"].ToString();
-                    Score = (Grade > 6 ? reader["NumberScore"].ToString() :
-                        reader["LetterScore"].ToString());
+                    listaNotas.Add(AssessmentId, Score);                                                            
+                }
+                reader.Close();
+                sqlConnection.Close();
+                #endregion
+                #region Operaciones para query II
+                sqlConnection.Open();
+                sqlCommand = new SqlCommand(queryII, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                sqlCommand.Parameters.AddWithValue("@SubjectId", SubjectId);
+                reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Grade = Convert.ToInt32(reader["Grade"].ToString());
+                    Percentage = Convert.ToInt32(reader["AssessmentPercentage"].ToString());
+                    Assessment = (Grade > 6 ? reader["AssessmentName"].ToString() + " (" + Percentage.ToString() + "%)" : reader["AssessmentName"].ToString());
+                    AssessmentId = Convert.ToInt32(reader["AssessmentId"].ToString());
                     Period = reader["Period"].ToString();
+                    Score = (listaNotas.ContainsKey(AssessmentId) ? Score = listaNotas[AssessmentId] : "N/A");
 
                     result.Add(new
                     {
@@ -121,12 +156,18 @@ namespace Tesis_WebService
                     {
                         #region Bachillerato
                         if (Grade > 6) //Bachillerato
-                            calculoI += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        {
+                            if (Score.Equals("N/A"))
+                                calculoI += (double)(1 * Percentage) / 100;
+                            else
+                                calculoI += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        }
                         #endregion
                         #region Primaria
                         else //Primaria
                         {
-                            if (Score.Equals("A")) calculoI += 5;
+                            if (Score.Equals("N/A")) calculoI += 1;
+                            else if (Score.Equals("A")) calculoI += 5;
                             else if (Score.Equals("B")) calculoI += 4;
                             else if (Score.Equals("C")) calculoI += 3;
                             else if (Score.Equals("D")) calculoI += 2;
@@ -142,12 +183,18 @@ namespace Tesis_WebService
                     {
                         #region Bachillerato
                         if (Grade > 6) //Bachillerato
-                            calculoII += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        {
+                            if (Score.Equals("N/A"))
+                                calculoII += (double)(1 * Percentage) / 100;
+                            else
+                                calculoII += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        }
                         #endregion
                         #region Primaria
                         else //Primaria
                         {
-                            if (Score.Equals("A")) calculoII += 5;
+                            if (Score.Equals("N/A")) calculoII += 1;
+                            else if (Score.Equals("A")) calculoII += 5;
                             else if (Score.Equals("B")) calculoII += 4;
                             else if (Score.Equals("C")) calculoII += 3;
                             else if (Score.Equals("D")) calculoII += 2;
@@ -163,12 +210,18 @@ namespace Tesis_WebService
                     {
                         #region Bachillerato
                         if (Grade > 6) //Bachillerato
-                            calculoIII += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        {
+                            if (Score.Equals("N/A"))
+                                calculoIII += (double)(1 * Percentage) / 100;
+                            else
+                                calculoIII += (double)(Convert.ToInt32(Score) * Percentage) / 100;
+                        }
                         #endregion
                         #region Primaria
                         else //Primaria
                         {
-                            if (Score.Equals("A")) calculoIII += 5;
+                            if (Score.Equals("N/A")) calculoIII += 1;
+                            else if (Score.Equals("A")) calculoIII += 5;
                             else if (Score.Equals("B")) calculoIII += 4;
                             else if (Score.Equals("C")) calculoIII += 3;
                             else if (Score.Equals("D")) calculoIII += 2;
@@ -181,33 +234,31 @@ namespace Tesis_WebService
                     #endregion
                     #endregion
                 }
-                reader.Close();
 
-                #region Cálculo definitiva
-                #region Bachillerato
+                #region Definitiva
                 if (Grade > 6) //Bachillerato
                 {
-                    definitiva = Math.Round((double)(calculoI + calculoII + calculoIII) / 3, 2);
-                    result.Add(new { Definitiva = definitiva });
+                    definitiva = (double)(calculoI + calculoII + calculoIII) / 3;
+                    DefinitivaString = Math.Round(definitiva, 2).ToString();
                 }
-                #endregion
-                #region Primaria
                 else //Primaria
                 {
-                    definitiva = Math.Round((double)(((double)calculoI / contadorI) +
-                                           ((double)calculoII / contadorII) +
-                                           ((double)calculoIII / contadorIII)) / 3);
+                    definitiva = (double)((double)(calculoI / contadorI) +
+                                 (double)(calculoII / contadorII) +
+                                 (double)(calculoIII / contadorIII)) / 3;
 
-                    if (definitiva == 1) DefinitivaString = "A";
-                    else if (definitiva == 2) DefinitivaString = "B";
-                    else if (definitiva == 3) DefinitivaString = "C";
-                    else if (definitiva == 4) DefinitivaString = "D";
-                    else if (definitiva == 5) DefinitivaString = "E";
-
-                    result.Add(new { Definitiva = DefinitivaString });
+                    if (Math.Round(definitiva) == 5) DefinitivaString = "A";
+                    else if (Math.Round(definitiva) == 4) DefinitivaString = "B";
+                    else if (Math.Round(definitiva) == 3) DefinitivaString = "C";
+                    else if (Math.Round(definitiva) == 2) DefinitivaString = "D";
+                    else if (Math.Round(definitiva) == 1) DefinitivaString = "E";
                 }
+
+                result.Add(new { Definitiva = DefinitivaString });
                 #endregion
-                #endregion
+
+                reader.Close();
+                sqlConnection.Close();
                 #endregion
             }
             #endregion
