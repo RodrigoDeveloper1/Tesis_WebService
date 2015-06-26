@@ -1021,15 +1021,39 @@ namespace Tesis_WebService
         }
 
         [WebMethod]
-        public void StatisticsImageGenerator(int type, int CourseId, int SchoolYearId, int SchoolId)
+        public void StatisticsImageGenerator(int type, int CourseId, int SchoolYearId, int SchoolId,
+            string imageBase64)
         {
+            #region Declaracíón de variables globales
+            string path = ConstantsRepository.STATISTICS_IMAGES_PATH_APP_UPLOADS;
+            path += @"\School_" + SchoolId + @"\SchoolYear_" + SchoolYearId + @"\";
+
+            string imgPath = "";
+            #endregion
+            #region Definiendo el nombre de la estadística
             switch (type)
             {
                 case ConstantsRepository.MOBILE_STATISTICS_CODE_AprobadosVsReprobados:
+                    imgPath = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
+                        ConstantsRepository.STATISTICS_IMG_1;                                        
                     break;
                 case ConstantsRepository.MOBILE_STATISTICS_CODE_Top10ResultadosDestacados:
+                    imgPath = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
+                        ConstantsRepository.STATISTICS_IMG_2;
                     break;
             }
+            #endregion
+            #region Obteniendo la ruta de la imagen
+            imgPath = Path.Combine(Server.MapPath(path), imgPath);
+            #endregion
+            #region Descifrando la imagen
+            byte[] imageBytes = Convert.FromBase64String(imageBase64);
+            MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
+            ms.Write(imageBytes, 0, imageBytes.Length);
+            Image img = Image.FromStream(ms, true);
+            #endregion
+
+            img.Save(imgPath);
         }
 
         [WebMethod]
@@ -1107,7 +1131,5 @@ namespace Tesis_WebService
 
             return new JavaScriptSerializer().Serialize(result);
         }
-
-        
     }
 }
