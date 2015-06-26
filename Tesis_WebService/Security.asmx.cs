@@ -812,19 +812,19 @@ namespace Tesis_WebService
                                      "STUDENTS S, " +
                                      "STUDENTCOURSES SC, " +
                                      "COURSES C " +
-                               "WHERE R.RepresentativeId = @UserId AND " +
-                                     "R.RepresentativeId = RS.Representative_RepresentativeId AND " +
-                                     "RS.Student_StudentId = S.StudentId AND " +
-                                     "S.StudentId = SC.Student_StudentId AND " +
-                                     "SC.Course_CourseId = C.CourseId";
+                                "WHERE R.RepresentativeId = @UserId AND " +
+                                      "R.RepresentativeId = RS.Representative_RepresentativeId AND " +
+                                      "RS.Student_StudentId = S.StudentId AND " +
+                                      "S.StudentId = SC.Student_StudentId AND " +
+                                      "SC.Course_CourseId = C.CourseId";
                 #endregion
                 #region QueryII - Notificaciones por estudiantes/cursos
                 string query2 =
                     "SELECT N.Attribution, " +
                            "N.NotificationId, " +
                            "N.AlertType, " +
-                           "CONVERT(DATE, N.DateOfCreation, 110) DateOfCreation, " +
-                           "CONVERT(DATE, N.SendDate, 110) SendDate, " +
+                           "CONVERT(DATE, N.DateOfCreation, 105) DateOfCreation, " +
+                           "CONVERT(DATE, N.SendDate, 105) SendDate, " +
                            "N.Message, " +
                            "N.Automatic, " +
                            "N.User_Id UserId " +
@@ -833,7 +833,7 @@ namespace Tesis_WebService
                     "WHERE N.NotificationId = SN.NotificationId AND  " +
                          "(SN.Student_StudentId = @StudentId OR " +
                          "SN.Course_CourseId = @CourseId) " +
-                    "ORDER BY N.SendDate";
+                    "ORDER BY N.SendDate DESC";
                 #endregion
                 #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
                 string query3 =
