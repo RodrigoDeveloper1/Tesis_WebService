@@ -821,6 +821,7 @@ namespace Tesis_WebService
                 #region QueryII - Notificaciones por estudiantes/cursos
                 string query2 =
                     "SELECT N.Attribution, " +
+                           "N.NotificationId, " +
                            "N.AlertType, " +
                            "CONVERT(DATE, N.DateOfCreation, 110) DateOfCreation, " +
                            "CONVERT(DATE, N.SendDate, 110) SendDate, " +
@@ -883,6 +884,7 @@ namespace Tesis_WebService
                         string Message = reader["Message"].ToString();
                         string Automatic = reader["Automatic"].ToString();
                         string From = "";
+                        string NotificationId = reader["NotificationId"].ToString();
 
                         #region Identificando el emisor
                         if(Automatic.Equals("True")) //Notificación automática
@@ -913,7 +915,8 @@ namespace Tesis_WebService
                             SendDate = SendDate,
                             Message = Message,
                             Automatic = Automatic,
-                            From = From
+                            From = From,
+                            NotificationId = NotificationId
                         });
                     }
                     #endregion
@@ -1018,6 +1021,18 @@ namespace Tesis_WebService
         }
 
         [WebMethod]
+        public void StatisticsImageGenerator(int type, int CourseId, int SchoolYearId, int SchoolId)
+        {
+            switch (type)
+            {
+                case ConstantsRepository.MOBILE_STATISTICS_CODE_AprobadosVsReprobados:
+                    break;
+                case ConstantsRepository.MOBILE_STATISTICS_CODE_Top10ResultadosDestacados:
+                    break;
+            }
+        }
+
+        [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string StudentsInfo(string UserId)
         {
@@ -1092,5 +1107,7 @@ namespace Tesis_WebService
 
             return new JavaScriptSerializer().Serialize(result);
         }
+
+        
     }
 }
