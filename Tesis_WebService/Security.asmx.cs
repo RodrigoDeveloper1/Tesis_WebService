@@ -820,14 +820,16 @@ namespace Tesis_WebService
                 #endregion
                 #region QueryII - Notificaciones por estudiantes/cursos
                 string query2 =
-                    "SELECT N.Attribution, " +
-                           "N.NotificationId, " +
+                    "SELECT N.Attribution, " +                           
                            "N.AlertType, " +
                            "CONVERT(DATE, N.DateOfCreation, 105) DateOfCreation, " +
                            "CONVERT(DATE, N.SendDate, 105) SendDate, " +
                            "N.Message, " +
                            "N.Automatic, " +
-                           "N.User_Id UserId " +
+                           "N.User_Id UserId, " +
+                           "SN.SentNotificationId, " +
+                           "SN.[Read], " +
+                           "SN.Sent " +       
                     "FROM NOTIFICATIONS N, " +
                          "SENTNOTIFICATIONS SN " +
                     "WHERE N.NotificationId = SN.NotificationId AND  " +
@@ -884,7 +886,8 @@ namespace Tesis_WebService
                         string Message = reader["Message"].ToString();
                         string Automatic = reader["Automatic"].ToString();
                         string From = "";
-                        string NotificationId = reader["NotificationId"].ToString();
+                        string NotificationId = reader["SentNotificationId"].ToString();
+                        string Read = reader["Read"].ToString();
 
                         #region Identificando el emisor
                         if(Automatic.Equals("True")) //Notificación automática
@@ -916,7 +919,8 @@ namespace Tesis_WebService
                             Message = Message,
                             Automatic = Automatic,
                             From = From,
-                            NotificationId = NotificationId
+                            NotificationId = NotificationId,
+                            Read = Read
                         });
                     }
                     #endregion
