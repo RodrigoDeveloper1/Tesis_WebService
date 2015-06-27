@@ -13,15 +13,16 @@ namespace Tesis_WebService
         #endregion
 
         #region AppHarbor
-        public const string APPHARBOR_DATABASE_CONNECTION = 
-                "Server=22868d3a-d013-47a8-9930-a49b015d6de0.sqlserver.sequelizer.com;"+
-                "Database=db22868d3ad01347a89930a49b015d6de0;User ID=wqwjhdllbiohkkls;"+
-                "Password=wAm8GrVkec54ZpqQbLfupnJXC3u8DPCf75P72rzJYRsokEHVdYqVsfBiZwDN6WNx;"+
+        public const string APPHARBOR_DATABASE_CONNECTION =
+                "Server=45e2a27d-28d0-4335-8ae2-a4c3014db818.sqlserver.sequelizer.com;" +
+                "Database=db45e2a27d28d043358ae2a4c3014db818;" +
+                "User ID=ydzlamzucsjhurji;" +
+                "Password=qmo2ZexLRdKuaM3p4CpZvseyq4k3LHJFU34YgM84RrR72JWzYhwszD87gWK62C8h;" +
                 "MultipleActiveResultSets=True;";
-        public const string APPHARBOR_HOSTNAME = "22868d3a-d013-47a8-9930-a49b015d6de0.sqlserver.sequelizer.com";
-        public const string APPHARBOR_USERNAME = "wqwjhdllbiohkkls";
-        public const string APPHARBOR_PASSWORD = "wAm8GrVkec54ZpqQbLfupnJXC3u8DPCf75P72rzJYRsokEHVdYqVsfBiZwDN6WNx";
-        public const string APPHARBOR_DATABASE = "db22868d3ad01347a89930a49b015d6de0";
+        public const string APPHARBOR_HOSTNAME = "45e2a27d-28d0-4335-8ae2-a4c3014db818.sqlserver.sequelizer.com";
+        public const string APPHARBOR_USERNAME = "ydzlamzucsjhurji";
+        public const string APPHARBOR_PASSWORD = "qmo2ZexLRdKuaM3p4CpZvseyq4k3LHJFU34YgM84RrR72JWzYhwszD87gWK62C8h";
+        public const string APPHARBOR_DATABASE = "db45e2a27d28d043358ae2a4c3014db818";
         #endregion
 
         public const string STATISTICS_IMAGES_PATH_APP_UPLOADS = @"~\App_Uploads\MobileApp_Statistics\";

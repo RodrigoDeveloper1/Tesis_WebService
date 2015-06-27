@@ -924,6 +924,7 @@ namespace Tesis_WebService
                         });
                     }
                     #endregion
+
                     reader.Close();
                 }
             }
@@ -947,7 +948,7 @@ namespace Tesis_WebService
 
             return new JavaScriptSerializer().Serialize(result);
         }
-
+                
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string Statistics(string SchoolId, string SchoolYearId, string CourseId)
@@ -1134,6 +1135,66 @@ namespace Tesis_WebService
             #endregion
 
             return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        public void UpdateNotifications(string[] ArrayIds)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            List<string> listaEstudiantes = new List<string>();
+            List<string> listaCursos = new List<string>();
+            SqlConnection sqlConnection = null;
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Query I - Update notifications
+                string query1 = "UPDATE SentNotifications " +
+                                "SET [Read] = 1 " +
+                                "WHERE SentNotificationId = @SentNotificationId";
+                #endregion
+                #region Conexión - QueryI (Parte I)
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(query1, sqlConnection);                
+                #endregion
+
+                #region Ciclo de actualizaciones
+                for (int i=0; i<= ArrayIds.Length; i++)
+                {
+                    #region Obteniendo id del SentNotification
+                    int SentNotificationId = Convert.ToInt32(ArrayIds[i]);
+                    #endregion
+                    #region Conexión - QueryI (Parte II)
+                    sqlCommand.Parameters.AddWithValue("@SentNotificationId", SentNotificationId);
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    #endregion
+                    if(reader.Read())
+                    {
+                        reader.Close();
+                    }
+                }
+                #endregion
+            }
+            #endregion
+            #region Catch
+            catch (SqlException)
+            {
+            }
+            catch (Exception)
+            {
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
         }
     }
 }
