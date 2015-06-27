@@ -1138,7 +1138,7 @@ namespace Tesis_WebService
         }
 
         [WebMethod]
-        public void UpdateNotifications(string[] ArrayIds)
+        public void UpdateNotifications(string ArrayIds)
         {
             #region Declarando variables
             List<object> result = new List<object>();
@@ -1146,37 +1146,40 @@ namespace Tesis_WebService
             List<string> listaCursos = new List<string>();
             SqlConnection sqlConnection = null;
             #endregion
+            #region Query I - Update notifications
+            string query1 = "UPDATE SentNotifications " +
+                            "SET [Read] = 1 " +
+                            "WHERE SentNotificationId = @SentNotificationId";
+            #endregion
 
             #region Try
             try
             {
-                #region Estableciendo la conexión a BD
-                sqlConnection = Conexion();
+                #region Separando el string
+                string[] ArrayIds_Array = ArrayIds.Split(',');
                 #endregion
-                #region Query I - Update notifications
-                string query1 = "UPDATE SentNotifications " +
-                                "SET [Read] = 1 " +
-                                "WHERE SentNotificationId = @SentNotificationId";
-                #endregion
-                #region Conexión - QueryI (Parte I)
-                sqlConnection.Open();
-                SqlCommand sqlCommand = new SqlCommand(query1, sqlConnection);                
-                #endregion
+                
 
                 #region Ciclo de actualizaciones
-                for (int i=0; i<= ArrayIds.Length; i++)
+                for (int i = 0; i < ArrayIds_Array.Length; i++)
                 {
+                    #region Estableciendo la conexión a BD
+                    sqlConnection = Conexion();
+                    #endregion
+                    #region Conexión - QueryI (Parte I)
+                    sqlConnection.Open();
+                    SqlCommand sqlCommand = sqlConnection.CreateCommand();
+                    #endregion
                     #region Obteniendo id del SentNotification
-                    int SentNotificationId = Convert.ToInt32(ArrayIds[i]);
+                    int SentNotificationId = Convert.ToInt32(ArrayIds_Array[i]);
                     #endregion
                     #region Conexión - QueryI (Parte II)
+                    sqlCommand.CommandText = query1;
                     sqlCommand.Parameters.AddWithValue("@SentNotificationId", SentNotificationId);
-                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    sqlCommand.ExecuteNonQuery();
+                    sqlCommand.Dispose();
+                    sqlConnection.Close();
                     #endregion
-                    if(reader.Read())
-                    {
-                        reader.Close();
-                    }
                 }
                 #endregion
             }
@@ -1187,12 +1190,6 @@ namespace Tesis_WebService
             }
             catch (Exception)
             {
-            }
-            #endregion
-            #region Finally
-            finally
-            {
-                sqlConnection.Close();
             }
             #endregion
         }
