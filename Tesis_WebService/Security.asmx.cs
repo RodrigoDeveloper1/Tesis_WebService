@@ -1003,7 +1003,7 @@ namespace Tesis_WebService
                          "(SN.Student_StudentId = @StudentId OR " +
                          "SN.Course_CourseId = @CourseId) AND " +
                          "SN.New = 1 " +
-                    "ORDER BY N.SendDate DESC";
+                    "ORDER BY N.DateOfCreation DESC";
                 #endregion
                 #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
                 string query3 =
