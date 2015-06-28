@@ -829,7 +829,8 @@ namespace Tesis_WebService
                            "N.User_Id UserId, " +
                            "SN.SentNotificationId, " +
                            "SN.[Read], " +
-                           "SN.Sent " +       
+                           "SN.Sent, " +
+                           "SN.New " +
                     "FROM NOTIFICATIONS N, " +
                          "SENTNOTIFICATIONS SN " +
                     "WHERE N.NotificationId = SN.NotificationId AND  " +
@@ -843,6 +844,12 @@ namespace Tesis_WebService
                            "LastName User_LastName " +
                     "FROM AspNetUsers " +
                     "WHERE Id = '@UserId'";
+                #endregion
+                #region Query IV - Actualizador de 'News' para notificaciones
+                string query4 =
+                    "UPDATE SentNotifications "+ 
+                    "SET New = 0 "+
+                    "WHERE SentNotificationId = @SentNotificationId";
                 #endregion
 
                 #region Conexión - QueryI
@@ -888,6 +895,7 @@ namespace Tesis_WebService
                         string From = "";
                         string NotificationId = reader["SentNotificationId"].ToString();
                         string Read = reader["Read"].ToString();
+                        string New = reader["New"].ToString();
 
                         #region Identificando el emisor
                         if(Automatic.Equals("True")) //Notificación automática
@@ -909,7 +917,7 @@ namespace Tesis_WebService
                             reader2.Close();
                         }
                         #endregion
-
+                        #region Resultado final
                         result.Add(new
                         {
                             Attribution = Attribution,
@@ -920,8 +928,23 @@ namespace Tesis_WebService
                             Automatic = Automatic,
                             From = From,
                             NotificationId = NotificationId,
-                            Read = Read
+                            Read = Read,
+                            New = New
                         });
+                        #endregion
+
+                        #region Proceso para actualizar el new de las notificaciones
+                        if(New.Equals("True"))
+                        {
+                            SqlConnection sqlConnection2 = Conexion();
+                            sqlConnection2.Open();
+                            SqlCommand sqlCommand3 = sqlConnection2.CreateCommand();
+                            sqlCommand3.CommandText = query4;
+                            sqlCommand3.Parameters.AddWithValue("@SentNotificationId", NotificationId);
+                            sqlCommand3.ExecuteNonQuery();
+                            sqlCommand3.Dispose();
+                        }
+                        #endregion
                     }
                     #endregion
 
@@ -1137,6 +1160,12 @@ namespace Tesis_WebService
             return new JavaScriptSerializer().Serialize(result);
         }
 
+        /// <summary>
+        /// Método definido para actualizar aquellas notificaciones que ya están leídas. Utilizando el atributo
+        /// 'Read'.
+        /// </summary>
+        /// <param name="ArrayIds">El string de la lista de Ids de las notificaciones leídas, separadas por una
+        /// coma (,)</param>
         [WebMethod]
         public void UpdateNotifications(string ArrayIds)
         {
