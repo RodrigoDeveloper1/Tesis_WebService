@@ -971,6 +971,192 @@ namespace Tesis_WebService
 
             return new JavaScriptSerializer().Serialize(result);
         }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string NewNotifications(string UserId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            List<string> listaEstudiantes = new List<string>();
+            List<string> listaCursos = new List<string>();
+            SqlConnection sqlConnection = null;
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region QueryI - Estudiantes y cursos respectivos
+                string query1 = "SELECT S.STUDENTID StudentId, " +
+                                       "C.CourseId CourseId " +
+                                "FROM REPRESENTATIVES R, " +
+                                     "REPRESENTATIVESTUDENTS RS, " +
+                                     "STUDENTS S, " +
+                                     "STUDENTCOURSES SC, " +
+                                     "COURSES C " +
+                                "WHERE R.RepresentativeId = @UserId AND " +
+                                      "R.RepresentativeId = RS.Representative_RepresentativeId AND " +
+                                      "RS.Student_StudentId = S.StudentId AND " +
+                                      "S.StudentId = SC.Student_StudentId AND " +
+                                      "SC.Course_CourseId = C.CourseId";
+                #endregion
+                #region QueryII - Notificaciones por estudiantes/cursos
+                string query2 =
+                    "SELECT N.Attribution, " +
+                           "N.AlertType, " +
+                           "CONVERT(DATE, N.DateOfCreation, 105) DateOfCreation, " +
+                           "CONVERT(DATE, N.SendDate, 105) SendDate, " +
+                           "N.Message, " +
+                           "N.Automatic, " +
+                           "N.User_Id UserId, " +
+                           "SN.SentNotificationId, " +
+                           "SN.[Read], " +
+                           "SN.Sent, " +
+                           "SN.New " +
+                    "FROM NOTIFICATIONS N, " +
+                         "SENTNOTIFICATIONS SN " +
+                    "WHERE N.NotificationId = SN.NotificationId AND  " +
+                         "(SN.Student_StudentId = @StudentId OR " +
+                         "SN.Course_CourseId = @CourseId) AND " +
+                         "SN.New = 1 " +
+                    "ORDER BY N.SendDate DESC";
+                #endregion
+                #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
+                string query3 =
+                    "SELECT Name User_Name, " +
+                           "LastName User_LastName " +
+                    "FROM AspNetUsers " +
+                    "WHERE Id = '@UserId'";
+                #endregion
+                #region Query IV - Actualizador de 'News' para notificaciones
+                string query4 =
+                    "UPDATE SentNotifications " +
+                    "SET New = 0 " +
+                    "WHERE SentNotificationId = @SentNotificationId";
+                #endregion
+
+                #region Conexión - QueryI
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(query1, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@UserId", UserId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+                #endregion
+                #region Lista de estudiantes & cursos
+                while (reader.Read())
+                {
+                    listaEstudiantes.Add(reader["StudentId"].ToString());
+                    listaCursos.Add(reader["CourseId"].ToString());
+                }
+                #endregion
+                reader.Close();
+
+                /* Nota (28-05-15): El Count() de la lista de estudiantes y la lista de cursos debe ser
+                 * exactamente igual, ya que por cada alumno asociado al representante, se trae el curso 
+                 * asociado a éste. - Rodrigo Uzcátegui. 
+                 */
+                for (int i = 0; i <= listaEstudiantes.Count() - 1; i++)
+                {
+                    #region Id de estudiante & curso
+                    string StudentId = listaEstudiantes[i];
+                    string CourseId = listaCursos[i];
+                    #endregion
+                    #region Conexión - QueryII
+                    sqlCommand = new SqlCommand(query2, sqlConnection);
+                    sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
+                    sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                    reader = sqlCommand.ExecuteReader();
+                    #endregion
+                    #region Lista de notificaciones
+                    while (reader.Read())
+                    {
+                        string Attribution = reader["Attribution"].ToString();
+                        string AlertType = reader["AlertType"].ToString();
+                        string DateOfCreation = reader["DateOfCreation"].ToString();
+                        string SendDate = reader["SendDate"].ToString();
+                        string Message = reader["Message"].ToString();
+                        string Automatic = reader["Automatic"].ToString();
+                        string From = "";
+                        string NotificationId = reader["SentNotificationId"].ToString();
+                        string Read = reader["Read"].ToString();
+                        string New = reader["New"].ToString();
+
+                        #region Identificando el emisor
+                        if (Automatic.Equals("True")) //Notificación automática
+                            From = "Notificación Automática";
+                        else
+                        {
+                            string TeacherId = reader["UserId"].ToString();
+
+                            #region Conexión - QueryIII
+                            SqlCommand sqlCommand2 = new SqlCommand(query3, sqlConnection);
+                            sqlCommand2.Parameters.AddWithValue("@UserId", TeacherId);
+                            SqlDataReader reader2 = sqlCommand2.ExecuteReader();
+                            #endregion
+
+                            if (reader2.Read())
+                                From = "Prof. " + reader2["User_Name"].ToString() + " " +
+                                    reader2["User_LastName"].ToString();
+
+                            reader2.Close();
+                        }
+                        #endregion
+                        #region Resultado final
+                        result.Add(new
+                        {
+                            Attribution = Attribution,
+                            AlertType = AlertType,
+                            DateOfCreation = DateOfCreation,
+                            SendDate = SendDate,
+                            Message = Message,
+                            Automatic = Automatic,
+                            From = From,
+                            NotificationId = NotificationId,
+                            Read = Read,
+                            New = New
+                        });
+                        #endregion
+
+                        #region Proceso para actualizar el new de las notificaciones
+                        if (New.Equals("True"))
+                        {
+                            SqlConnection sqlConnection2 = Conexion();
+                            sqlConnection2.Open();
+                            SqlCommand sqlCommand3 = sqlConnection2.CreateCommand();
+                            sqlCommand3.CommandText = query4;
+                            sqlCommand3.Parameters.AddWithValue("@SentNotificationId", NotificationId);
+                            sqlCommand3.ExecuteNonQuery();
+                            sqlCommand3.Dispose();
+                        }
+                        #endregion
+                    }
+                    #endregion
+
+                    reader.Close();
+                }
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
                 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
