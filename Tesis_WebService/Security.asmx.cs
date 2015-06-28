@@ -845,12 +845,6 @@ namespace Tesis_WebService
                     "FROM AspNetUsers " +
                     "WHERE Id = '@UserId'";
                 #endregion
-                #region Query IV - Actualizador de 'News' para notificaciones
-                string query4 =
-                    "UPDATE SentNotifications "+ 
-                    "SET New = 0 "+
-                    "WHERE SentNotificationId = @SentNotificationId";
-                #endregion
 
                 #region Conexión - QueryI
                 sqlConnection.Open();
@@ -931,19 +925,6 @@ namespace Tesis_WebService
                             Read = Read,
                             New = New
                         });
-                        #endregion
-
-                        #region Proceso para actualizar el new de las notificaciones
-                        if(New.Equals("True"))
-                        {
-                            SqlConnection sqlConnection2 = Conexion();
-                            sqlConnection2.Open();
-                            SqlCommand sqlCommand3 = sqlConnection2.CreateCommand();
-                            sqlCommand3.CommandText = query4;
-                            sqlCommand3.Parameters.AddWithValue("@SentNotificationId", NotificationId);
-                            sqlCommand3.ExecuteNonQuery();
-                            sqlCommand3.Dispose();
-                        }
                         #endregion
                     }
                     #endregion
