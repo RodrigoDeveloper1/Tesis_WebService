@@ -546,7 +546,9 @@ namespace Tesis_WebService
                           "P.SchoolYear_SchoolYearId = SY.SchoolYearId AND " +
                           "SY.School_SchoolId = SCH.SchoolId AND " +
                           "CAST(P.StartDate AS DATE) <= CAST(GETDATE() AS DATE) AND " +
-                          "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE)";
+                          "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE) " + 
+                    "ORDER BY S.FirstName, " + 
+                             "S.SecondName";
                 /*Este query no incluye obtener información después de la fecha de finalización del último lapso*/
                 #endregion
                 #region Definiendo el query I/2 - Nro de estudiantes por curso
@@ -1268,7 +1270,7 @@ namespace Tesis_WebService
                 #endregion
                 #region Definiendo el query
                 string query =
-                    "SELECT S.* " +
+                    "SELECT DISTINCT S.* " +
                     "FROM STUDENTS S, " +
                          "RepresentativeStudents RS, " +
                          "Representatives R, " +
@@ -1279,7 +1281,8 @@ namespace Tesis_WebService
                           "R.RepresentativeId = @UserId AND " +
                           "S.StudentId = SC.Student_StudentId AND " +
                           "SC.Course_CourseId = C.CourseId " +
-                    "ORDER BY C.Grade DESC";
+                    "ORDER BY S.FirstName, " + 
+                             "S.SecondName";
                 #endregion
 
                 #region Abriendo la conexión y ejecutando la consulta
