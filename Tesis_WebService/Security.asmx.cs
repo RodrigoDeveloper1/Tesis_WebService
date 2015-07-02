@@ -698,7 +698,7 @@ namespace Tesis_WebService
             SqlConnection sqlConnection = null;
             #endregion
 
-            #region
+            #region Try
             try
             {
                 #region Estableciendo la conexión a BD
@@ -732,19 +732,80 @@ namespace Tesis_WebService
 
                 while (reader.Read())
                 {
-                    string CareerType = reader["CareerType"].ToString();
                     string CareerDescription = reader["CareerDescription"].ToString();
                     string OccupationalArea = reader["OccupationalArea"].ToString();
                     string InstituteId = reader["InstituteId"].ToString();
                     string InstituteName = reader["InstituteName"].ToString();
-                    string InstituteProfile = reader["InstituteProfile"].ToString();
 
                     result.Add(new {
                         CareerDescription = CareerDescription,
                         OccupationalArea = OccupationalArea,
                         InstituteId = InstituteId,
                         InstituteName = InstituteName,
-                        InstituteProfile = InstituteProfile,
+                    });
+                }
+                reader.Close();
+                #endregion
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string CoreInfo(string CoreId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el queryI - Info del núcleo
+                string queryI =
+                    "SELECT C.CoreName, " + 
+                           "C.Address " + 
+                    "FROM Cores C " +
+                    "WHERE C.CoreId = @CoreId";
+                #endregion
+
+                #region Operaciones para queryI
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@CoreId", CoreId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string CoreName = reader["CoreName"].ToString();
+                    string Address = reader["Address"].ToString();
+
+                    result.Add(new
+                    {
+                        CoreName = CoreName,
+                        Address = Address,
                     });
                 }
                 reader.Close();
@@ -1197,6 +1258,76 @@ namespace Tesis_WebService
             catch (Exception e)
             {
                 result = new { Success = false, Exception = e.Message };
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string InstituteInfo(string InstituteId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el queryI - Info de la carrera
+                string queryI =
+                    "SELECT I.InstituteId, " + 
+                           "I.[Name] InstituteName, " + 
+                           "I.Profile InstituteProfile, " + 
+                           "C.CoreId, " + 
+                           "C.CoreName, " + 
+                           "C.Address " + 
+                    "FROM Institutes I, " + 
+                         "Cores C " +
+                    "WHERE I.InstituteId = @InstituteId AND " + 
+                          "I.InstituteId = C.InstituteId";
+                #endregion
+
+                #region Operaciones para queryI
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@InstituteId", InstituteId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string InstituteProfile = reader["InstituteProfile"].ToString();
+                    string CoreId = reader["CoreId"].ToString();
+
+                    result.Add(new
+                    {
+                        InstituteProfile = InstituteProfile,
+                        CoreId = CoreId,
+                    });
+                }
+                reader.Close();
+                #endregion
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
             }
             #endregion
             #region Finally
