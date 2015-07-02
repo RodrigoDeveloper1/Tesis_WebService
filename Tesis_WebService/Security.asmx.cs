@@ -284,6 +284,405 @@ namespace Tesis_WebService
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string Careers(string StudentId, string SchoolId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
+            /* Tipos de razonamiento: 
+             *      Razonamiento verbal: #1
+             *      Razonamiento numérico: #2
+             */
+            Dictionary<int, float> porcentajesRazonamiento = new Dictionary<int, float>();
+            Dictionary<int, int> listaMaterias = new Dictionary<int, int>();
+            Dictionary<KeyValuePair<int, string>, double> acumuladosPorMateriaGrado =
+                new Dictionary<KeyValuePair<int, string>, double>();
+
+            string argumento = "";
+            bool Success = false;
+
+            #region Definiendo lista de materias de razonamientos
+            /*Dictionary<string, float> listaMateriasRazonamiento = new Dictionary<string, float>();
+            //Razonamiento numérico
+            listaMateriasRazonamiento.Add("Matemática", 0);
+            listaMateriasRazonamiento.Add("Física", 0);
+
+            //Razonamiento verbal
+            listaMateriasRazonamiento.Add("Castellano", 0);
+            //Se suman estas dos
+            listaMateriasRazonamiento.Add("Historia de Venezuela", 0); 
+            listaMateriasRazonamiento.Add("Historia Universal", 0);
+            listaMateriasRazonamiento.Add("Geografía", 0);
+            listaMateriasRazonamiento.Add("Psicología", 0);
+            listaMateriasRazonamiento.Add("Inglés", 0);*/
+            double razonamientoVerbal = 0;
+            double razonamientoNumerico = 0;
+            int contadorVerbal = 0;
+            int contadorNumerico = 0;
+            #endregion
+
+            string SubjectName = "";
+            #endregion
+            #region Variables auxiliares de cálculo
+            double acumulativoLapsoI = 0;
+            double acumulativoLapsoII = 0;
+            double acumulativoLapsoIII = 0;
+            double acumulativoGrado = 0;
+            bool pase = false;
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el query I - Los scores del Test psicológico
+                string queryI = "SELECT PTS.ReasoningType, " + 
+                                       "PTS.PsychologicalTestId, " + 
+                                       "PTS.StudentId, " + 
+                                       "PTS.Score " + 
+                                "FROM Students S, " + 
+                                     "PsychologicalTest_Score PTS " + 
+                                "WHERE S.StudentId = @StudentId AND " + 
+                                      "S.StudentId = PTS.StudentId";
+                #endregion
+                #region Definiendo el query II - Las materias respectivas
+                string queryII = 
+                    "SELECT DISTINCT " + 
+                        "S.SubjectId, " + 
+                        "S.[Name], " + 
+                        "S.Grade " + 
+                    "FROM Subjects S, " + 
+                         "Courses C, " + 
+                         "CASUs CASU " + 
+                    "WHERE CASU.CourseId = C.CourseId AND " + 
+                          "CASU.SubjectId = S.SubjectId AND " + 
+                          "C.School_SchoolId = @SchoolId AND " + 
+                          "C.Grade = @CourseGrade AND " + 
+                          "C.Grade = S.Grade AND " + 
+                          "C.School_SchoolId = S.School_SchoolId";
+                #endregion
+                #region Definiendo el query III - Los assessments asociados al estudiante
+                string queryIII =
+                    "SELECT Sco.NumberScore, " + 
+                           "A.Percentage, " + 
+                           "A.[Name] AssessmentName, " + 
+                           "Su.[Name] SubjectName, " + 
+                           "Su.Grade, " + 
+                           "P.[Name] Period " +
+                    "FROM Assessments A, " + 
+                         "Courses C, " + 
+                         "CASUs CASU, " + 
+                         "StudentCourses SC, " + 
+                         "Students St, " + 
+                         "Scores Sco, " + 
+                         "Subjects Su, " + 
+                         "Periods P " +
+                    "WHERE " + 
+                          //Validación con Student
+                          "St.StudentId = @StudentId AND " +
+                          "St.StudentId = SC.Student_StudentId AND " +
+                          //Validación con Course
+                          "SC.Course_CourseId = C.CourseId AND " +
+                          "C.Grade = @CourseGrade AND " +
+                          "C.School_SchoolId = @SchoolId AND " +
+                          //Validación con CASU
+                          "CASU.CourseId = C.CourseId AND " +
+                          "CASU.CourseId = A.CASU_CourseId AND " +
+                          "CASU.SubjectId = A.CASU_SubjectId AND " +
+                          "CASU.SubjectId = Su.SubjectId AND " +
+                          "CASU.PeriodId = A.CASU_PeriodId AND " + 
+                          "CASU.PeriodId = P.PeriodId AND " +
+                          //Validación con Subject
+                          "Su.SubjectId = @SubjectId AND " +
+                          "Su.School_SchoolId = C.School_SchoolId AND " +
+                          //Validación con Score
+                          "Sco.StudentId = St.StudentId AND " +
+                          "Sco.AssessmentId = A.AssessmentId";
+                #endregion
+                #region Definiendo el query IV - Carreras (razonamiento numérico)
+                string queryIV = 
+                    "SELECT C.CareerId, " + 
+                           "C.Title, " + 
+                           "C.[Type], " + 
+                           "C.[Description], " + 
+                           "C.OccupationalArea, " + 
+                           "C.KnowledgeSubArea_KnowledgeSubAreaId " + 
+                    "FROM Careers C " + 
+                    "WHERE CareerId = 144 OR CareerId = 70 OR " + 
+                          "CareerId = 145 OR CareerId = 27 OR " + 
+                          "CareerId = 123 OR CareerId = 159 OR " + 
+                          "CareerId = 74 OR CareerId = 156 OR " + 
+                          "CareerId = 23 OR CareerId = 3 OR " + 
+                          "CareerId = 2 OR CareerId = 496 OR " + 
+                          "CareerId = 440 OR CareerId = 438 OR " + 
+                          "CareerId = 430";
+                #endregion
+                #region Definiendo el query V - Carreras (razonamiento verbal)
+                string queryV =
+                    "SELECT C.CareerId, " +
+                           "C.Title, " +
+                           "C.[Type], " +
+                           "C.[Description], " +
+                           "C.OccupationalArea, " +
+                           "C.KnowledgeSubArea_KnowledgeSubAreaId " +
+                    "FROM Careers C " +
+                    "WHERE CareerId = 522 OR CareerId = 526 OR " +
+                          "CareerId = 525 OR CareerId = 353 OR " +
+                          "CareerId = 335 OR CareerId = 329 OR " +
+                          "CareerId = 348 OR CareerId = 317 OR " +
+                          "CareerId = 332 OR CareerId = 521 OR " +
+                          "CareerId = 523 OR CareerId = 580 OR " +
+                          "CareerId = 590 OR CareerId = 592 OR " +
+                          "CareerId = 593 OR CareerId = 512 OR " +
+                          "CareerId = 475 OR CareerId = 482 OR " +
+                          "CareerId = 203 OR CareerId = 204 OR " +
+                          "CareerId = 210 OR CareerId = 583 OR " +
+                          "CareerId = 589";
+                #endregion
+
+                #region Operaciones para queryI
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    float PorcentajeRazonamiento = Convert.ToInt32(reader["Score"].ToString());
+                    int TipoRazonamiento = Convert.ToInt32(reader["ReasoningType"].ToString());
+                    porcentajesRazonamiento.Add(TipoRazonamiento, PorcentajeRazonamiento);
+                }
+                reader.Close();
+                #endregion
+                #region Operaciones para queryII
+                for (int Grade = 7; Grade <= 11; Grade++)
+                {
+                    sqlCommand = new SqlCommand(queryII, sqlConnection);
+                    sqlCommand.Parameters.AddWithValue("@SchoolId", SchoolId);
+                    sqlCommand.Parameters.AddWithValue("@CourseGrade", Grade);
+                    reader = sqlCommand.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        int SubjectId = Convert.ToInt32(reader["SubjectId"].ToString());
+                        int SubjectGrade = Convert.ToInt32(reader["Grade"].ToString());
+                        listaMaterias.Add(SubjectId, SubjectGrade);
+                    }
+                    reader.Close();
+                }
+                #endregion
+                #region Operaciones para queryIII
+                #region Ciclo por grado
+                for (int Grade = 7; Grade <= 11; Grade++)
+                {
+                    #region Ciclo por materia
+                    foreach (KeyValuePair<int, int> value in listaMaterias.Where(m => m.Value == Grade))
+                    {
+                        #region Conectando el query
+                        sqlCommand = new SqlCommand(queryIII, sqlConnection);
+                        sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
+                        sqlCommand.Parameters.AddWithValue("@CourseGrade", Grade);
+                        sqlCommand.Parameters.AddWithValue("@SchoolId", SchoolId);
+                        sqlCommand.Parameters.AddWithValue("@SubjectId", value.Key);
+                        reader = sqlCommand.ExecuteReader();
+                        #endregion
+                        #region Definiendo valor de variable pase
+                        pase = (reader.Read() ? true : false);
+                        #endregion
+                        #region Ciclo de resultados del query
+                        while (reader.Read())
+                        {
+                            #region Obtención de los datos
+                            double NumberScore = Convert.ToInt32(reader["NumberScore"].ToString());
+                            int Percentage = Convert.ToInt32(reader["Percentage"].ToString());
+                            string AssessmentName = reader["AssessmentName"].ToString();
+                            SubjectName = reader["SubjectName"].ToString();
+                            string Period = reader["Period"].ToString();
+                            #endregion
+
+                            #region 1er Lapso
+                            if(Period.Equals("1er Lapso"))
+                                acumulativoLapsoI += NumberScore * ((double)(Percentage) / 100);
+                            #endregion
+                            #region 2do Lapso
+                            else if (Period.Equals("2do Lapso"))
+                                acumulativoLapsoII += NumberScore * ((double)(Percentage) / 100);
+                            #endregion
+                            #region 3er Lapso
+                            else if (Period.Equals("3er Lapso"))
+                                acumulativoLapsoIII += NumberScore * ((double)(Percentage) / 100);
+                            #endregion
+                        }
+                        #endregion
+                        #region Cálculo acumulativos
+                        if (pase)
+                        {
+                            acumulativoGrado = Math.Round((double)(acumulativoLapsoI + acumulativoLapsoII + 
+                                acumulativoLapsoIII) / 3, 2);
+
+                            acumuladosPorMateriaGrado.Add(new KeyValuePair<int, string>(Grade, SubjectName),
+                                acumulativoGrado);
+                        }
+                        #endregion
+                        #region Reiniciando valores
+                        acumulativoLapsoI = 0;
+                        acumulativoLapsoII = 0;
+                        acumulativoLapsoIII = 0;
+                        acumulativoGrado = 0;
+                        reader.Close();
+                        #endregion
+                    }
+                    #endregion                
+                }
+                #endregion
+                #endregion
+
+                #region Agrupando las materias respectivas
+                foreach (KeyValuePair<KeyValuePair<int, string>, double> pairValue in acumuladosPorMateriaGrado)
+                {
+                    if(pairValue.Key.Value.Equals("Matemática") || pairValue.Key.Value.Equals("Física"))
+                    {
+                        razonamientoNumerico += (double)pairValue.Value;
+                        contadorNumerico++;
+                    }
+                    else if (pairValue.Key.Value.Equals("Castellano") || 
+                             pairValue.Key.Value.Equals("Historia de Venezuela") ||
+                             pairValue.Key.Value.Equals("Historia Universal") ||
+                             pairValue.Key.Value.Equals("Geografía") ||
+                             pairValue.Key.Value.Equals("Psicología") ||
+                             pairValue.Key.Value.Equals("Inglés"))
+                    {
+                        razonamientoVerbal += (double)pairValue.Value;
+                        contadorVerbal++;
+                    }
+                }
+                #endregion
+                #region Resultados de razonamientos verbal y numérico por materias
+                razonamientoNumerico = (double)razonamientoNumerico / contadorNumerico;
+                razonamientoVerbal = (double)razonamientoVerbal / contadorVerbal;
+                #endregion
+                #region Cálculo matriz valores referenciales de carreras a sugerir
+                float razonamientoVerbalTest = porcentajesRazonamiento.Where(m => m.Key == 1).FirstOrDefault().Value;
+                float razonamientoNumericoTest = porcentajesRazonamiento.Where(m => m.Key == 2).FirstOrDefault().Value;
+
+                #region Caso #1 - Razonamiento <= 40%
+                if (razonamientoVerbalTest <= 40 && razonamientoNumericoTest <= 40)
+                {
+                    argumento = "No se muestran carreras universitarias, debido a que los resultados " +
+                    "obtenidos son de interpretación ambigua; requieren de otras técnicas de abordo " +
+                    "psicológico que permitan involucrar elementos para la toma de decisión vocacional, como" +
+                    " lo son: la evaluación de intereses personales, actitudes, valores, y entorno familiar.";
+                    Success = false;
+
+                    result.Add(new
+                    {
+                        Success = Success,
+                        Argumento = argumento,
+                    });
+                }
+                #endregion
+                #region Caso #2 - <=13pts
+                else if (razonamientoVerbal <= 13 && razonamientoNumerico <= 13) 
+                {
+                    argumento = "No se muestran carreras universitarias, debido a que los resultados " +
+                    "obtenidos son de interpretación ambigua; requieren de otras técnicas de abordo " +
+                    "psicológico que permitan involucrar elementos para la toma de decisión vocacional, como" +
+                    " lo son: la evaluación de intereses personales, actitudes, valores, y entorno familiar.";
+                    Success = false;
+
+                    result.Add(new
+                    {
+                        Success = Success,
+                        Argumento = argumento,
+                    });
+                }
+                #endregion
+                else
+                {                    
+                    #region Caso #3 - Razonamiento Verbal > 13 && > 14pts
+                    if (razonamientoVerbal > 13 && razonamientoVerbalTest > 41)
+                    {
+                        Success = true;
+                        #region Operaciones para query IV
+                        sqlCommand = new SqlCommand(queryIV, sqlConnection);
+                        reader = sqlCommand.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            string CareerId = reader["CareerId"].ToString();
+                            string Title = reader["Title"].ToString();
+                            string Type = reader["Type"].ToString();
+                            string Description = reader["Description"].ToString();
+                            string OccupationalArea = reader["OccupationalArea"].ToString();
+                            string KnowledgeSubAreaId = reader["KnowledgeSubArea_KnowledgeSubAreaId"].ToString();
+
+                            result.Add(new
+                            {
+                                Success = Success,
+                                CareerId = CareerId,
+                                Title = Title,
+                            });
+                        }
+                        reader.Close();
+                        #endregion
+                    }
+                    #endregion
+                    #region Caso #4 - Razonamiento Numérico > 13 && > 14pts
+                    if (razonamientoNumerico > 13 && razonamientoNumericoTest > 41)
+                    {
+                        Success = true;
+                        #region Operaciones para query V
+                        sqlCommand = new SqlCommand(queryV, sqlConnection);
+                        reader = sqlCommand.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            string CareerId = reader["CareerId"].ToString();
+                            string Title = reader["Title"].ToString();
+                            string Type = reader["Type"].ToString();
+                            string Description = reader["Description"].ToString();
+                            string OccupationalArea = reader["OccupationalArea"].ToString();
+                            string KnowledgeSubAreaId = reader["KnowledgeSubArea_KnowledgeSubAreaId"].ToString();
+
+                            result.Add(new
+                            {
+                                Success = Success,
+                                CareerId = CareerId,
+                                Title = Title,
+                            });
+                        }
+                        reader.Close();
+                        #endregion
+                    }
+                    #endregion
+                }
+                #endregion
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string CourseInfo(string StudentId, string PeriodId)
         {
             #region Declarando variables
