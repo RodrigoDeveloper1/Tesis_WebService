@@ -431,7 +431,7 @@ namespace Tesis_WebService
                     "FROM Careers C " +
                     "WHERE CareerId = 528 OR CareerId = 342 OR " +
                           "CareerId = 532 OR CareerId = 527 OR " +
-                          "CareerId = 531 OR CareerId = 530 OR " +
+                          "CareerId = 531 OR CareerId = 529 OR " +
                           "CareerId = 358 OR CareerId = 586 OR " +
                           "CareerId = 340 OR CareerId = 596 OR " +
                           "CareerId = 334 OR CareerId = 598 OR " +
