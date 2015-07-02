@@ -683,6 +683,40 @@ namespace Tesis_WebService
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string CareersInfo(string CareerId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
+            #endregion
+
+            #region
+            try
+            {
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string CourseInfo(string StudentId, string PeriodId)
         {
             #region Declarando variables
