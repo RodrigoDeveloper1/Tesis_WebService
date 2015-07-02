@@ -578,8 +578,10 @@ namespace Tesis_WebService
 
                     result.Add(new
                     {
-                        Success = Success,
+                        Success = (Success ? "True" : "False"),
                         Argumento = argumento,
+                        CareerId = "",
+                        Title = ""
                     });
                 }
                 #endregion
@@ -594,8 +596,10 @@ namespace Tesis_WebService
 
                     result.Add(new
                     {
-                        Success = Success,
+                        Success = (Success ? "True" : "False"),
                         Argumento = argumento,
+                        CareerId = "",
+                        Title = ""
                     });
                 }
                 #endregion
@@ -620,9 +624,10 @@ namespace Tesis_WebService
 
                             result.Add(new
                             {
-                                Success = Success,
+                                Success = (Success ? "True" : "False"),
+                                Argumento = argumento,
                                 CareerId = CareerId,
-                                Title = Title,
+                                Title = Title,                                
                             });
                         }
                         reader.Close();
@@ -648,7 +653,8 @@ namespace Tesis_WebService
 
                             result.Add(new
                             {
-                                Success = Success,
+                                Success = (Success ? "True" : "False"),
+                                Argumento = argumento,
                                 CareerId = CareerId,
                                 Title = Title,
                             });
