@@ -410,14 +410,15 @@ namespace Tesis_WebService
                            "C.OccupationalArea, " + 
                            "C.KnowledgeSubArea_KnowledgeSubAreaId " + 
                     "FROM Careers C " + 
-                    "WHERE CareerId = 144 OR CareerId = 70 OR " + 
-                          "CareerId = 145 OR CareerId = 27 OR " + 
-                          "CareerId = 123 OR CareerId = 159 OR " + 
-                          "CareerId = 74 OR CareerId = 156 OR " + 
-                          "CareerId = 23 OR CareerId = 3 OR " + 
-                          "CareerId = 2 OR CareerId = 496 OR " + 
-                          "CareerId = 440 OR CareerId = 438 OR " + 
-                          "CareerId = 430";
+                    "WHERE CareerId = 148 OR CareerId = 160 OR " + 
+                          "CareerId = 70 OR CareerId = 23 OR " + 
+                          "CareerId = 149 OR CareerId = 3 OR " + 
+                          "CareerId = 27 OR CareerId = 2 OR " + 
+                          "CareerId = 127 OR CareerId = 502 OR " + 
+                          "CareerId = 163 OR CareerId = 446 OR " + 
+                          "CareerId = 74 OR CareerId = 445 OR " + 
+                          "CareerId = 436 " + 
+                    "ORDER BY Title";
                 #endregion
                 #region Definiendo el query V - Carreras (razonamiento verbal)
                 string queryV =
@@ -428,18 +429,19 @@ namespace Tesis_WebService
                            "C.OccupationalArea, " +
                            "C.KnowledgeSubArea_KnowledgeSubAreaId " +
                     "FROM Careers C " +
-                    "WHERE CareerId = 522 OR CareerId = 526 OR " +
-                          "CareerId = 525 OR CareerId = 353 OR " +
-                          "CareerId = 335 OR CareerId = 329 OR " +
-                          "CareerId = 348 OR CareerId = 317 OR " +
-                          "CareerId = 332 OR CareerId = 521 OR " +
-                          "CareerId = 523 OR CareerId = 580 OR " +
-                          "CareerId = 590 OR CareerId = 592 OR " +
-                          "CareerId = 593 OR CareerId = 512 OR " +
-                          "CareerId = 475 OR CareerId = 482 OR " +
-                          "CareerId = 203 OR CareerId = 204 OR " +
-                          "CareerId = 210 OR CareerId = 583 OR " +
-                          "CareerId = 589";
+                    "WHERE CareerId = 528 OR CareerId = 342 OR " +
+                          "CareerId = 532 OR CareerId = 527 OR " +
+                          "CareerId = 531 OR CareerId = 530 OR " +
+                          "CareerId = 358 OR CareerId = 586 OR " +
+                          "CareerId = 340 OR CareerId = 596 OR " +
+                          "CareerId = 334 OR CareerId = 598 OR " +
+                          "CareerId = 353 OR CareerId = 599 OR " +
+                          "CareerId = 600 OR CareerId = 518 OR " +
+                          "CareerId = 481 OR CareerId = 207 OR " +
+                          "CareerId = 488 OR CareerId = 208 OR " +
+                          "CareerId = 214 OR CareerId = 595 OR " +
+                          "CareerId = 589 OR CareerId = 322 " +
+                     "ORDER BY Title";
                 #endregion
 
                 #region Operaciones para queryI
@@ -699,6 +701,13 @@ namespace Tesis_WebService
             #region
             try
             {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el queryI - Info de la carrera
+                string queryI = 
+                    "";
+                #endregion
             }
             #endregion
             #region Catch
