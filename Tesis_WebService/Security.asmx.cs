@@ -706,7 +706,48 @@ namespace Tesis_WebService
                 #endregion
                 #region Definiendo el queryI - Info de la carrera
                 string queryI = 
-                    "";
+                    "SELECT C.[Type] CareerType, " + 
+                           "C.[Description] CareerDescription, " + 
+                           "C.OccupationalArea, " + 
+                           "I.InstituteId, " + 
+                           "I.[Name] InstituteName, " + 
+                           "I.Profile InstituteProfile " + 
+                    "FROM Careers C, " + 
+                         "Opportunities O, " + 
+                         "Cores Co, " + 
+                         "Institutes I " + 
+                    "WHERE C.CareerId = @CareerId AND " + 
+                          "C.CareerId = O.CareerId AND " + 
+                          "O.CoreId = Co.CoreId AND " + 
+                          "O.InstituteId = Co.InstituteId AND " + 
+                          "Co.InstituteId = I.InstituteId " + 
+                    "ORDER BY I.[Name]";
+                #endregion
+
+                #region Operaciones para queryI
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@CareerId", CareerId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string CareerType = reader["CareerType"].ToString();
+                    string CareerDescription = reader["CareerDescription"].ToString();
+                    string OccupationalArea = reader["OccupationalArea"].ToString();
+                    string InstituteId = reader["InstituteId"].ToString();
+                    string InstituteName = reader["InstituteName"].ToString();
+                    string InstituteProfile = reader["InstituteProfile"].ToString();
+
+                    result.Add(new {
+                        CareerDescription = CareerDescription,
+                        OccupationalArea = OccupationalArea,
+                        InstituteId = InstituteId,
+                        InstituteName = InstituteName,
+                        InstituteProfile = InstituteProfile,
+                    });
+                }
+                reader.Close();
                 #endregion
             }
             #endregion
