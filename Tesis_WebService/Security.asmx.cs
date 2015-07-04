@@ -696,6 +696,8 @@ namespace Tesis_WebService
             #region Declarando variables
             List<object> result = new List<object>();
             SqlConnection sqlConnection = null;
+            bool pase = true; /* Variable utilizada para controlar los datos a insertar en la lista de 
+                               * resultados */
             #endregion
 
             #region Try
@@ -737,9 +739,18 @@ namespace Tesis_WebService
                     string InstituteId = reader["InstituteId"].ToString();
                     string InstituteName = reader["InstituteName"].ToString();
 
+                    #region Acción por booleano "pase"
+                    if (pase)
+                    {
+                        result.Add(new {
+                            CareerDescription = CareerDescription,
+                            OccupationalArea = OccupationalArea
+                        });
+                        pase = false; //Controlando la data a insertar
+                    }
+                    #endregion
+
                     result.Add(new {
-                        CareerDescription = CareerDescription,
-                        OccupationalArea = OccupationalArea,
                         InstituteId = InstituteId,
                         InstituteName = InstituteName,
                     });
