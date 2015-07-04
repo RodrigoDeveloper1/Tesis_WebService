@@ -865,6 +865,23 @@ namespace Tesis_WebService
                 #region Estableciendo la conexión a BD
                 sqlConnection = Conexion();
                 #endregion
+                #region Definiendo el query 0
+                string query0 = 
+                    "SELECT MAX(C.Grade) Grade " + 
+                    "FROM Students ST, " + 
+                         "StudentCourses SC, " + 
+                         "Courses C, " + 
+                         "CASUs CASU, " + 
+                         "Periods P, " + 
+                         "SchoolYears SY " + 
+                    "WHERE ST.StudentId = @StudentId AND " + 
+                          "ST.StudentId = SC.Student_StudentId AND " + 
+                          "SC.Course_CourseId = C.CourseId AND " + 
+                          "CASU.CourseId = C.CourseId AND " + 
+                          "CASU.PeriodId = P.PeriodId AND " + 
+                          "P.SchoolYear_SchoolYearId = SY.SchoolYearId AND " + 
+                          "SY.Status = 1";
+                #endregion
                 #region Definiendo el query I
                 string queryI =
                     "SELECT C.CourseId CourseId, " +
@@ -926,25 +943,39 @@ namespace Tesis_WebService
                           "A.AssessmentId = S.AssessmentId";
                 #endregion
 
-                #region Operaciones para query I
+                #region Operaciones para query 0
                 sqlConnection.Open();
-                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                SqlCommand sqlCommand = new SqlCommand(query0, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                if(reader.Read())
+                    CourseGrade = Convert.ToInt32(reader["Grade"].ToString());
+
+                reader.Close();
+                #endregion
+                #region Operaciones para query I
+                sqlCommand = new SqlCommand(queryI, sqlConnection);
                 sqlCommand.Parameters.AddWithValue("@StudentId", StudentId);
                 sqlCommand.Parameters.AddWithValue("@PeriodId", PeriodId);
-                SqlDataReader reader = sqlCommand.ExecuteReader();
+                reader = sqlCommand.ExecuteReader();
                 
                 while (reader.Read())
                 {
                     SiHayData = true;
                     CourseId = reader["CourseId"].ToString();
                     CourseName = reader["CourseName"].ToString();
-                    CourseGrade = Convert.ToInt32(reader["CourseGrade"].ToString());
                     CourseSection = reader["CourseSection"].ToString();
-                    Materias += ":" + 
-                                reader["SubjectId"].ToString() + ":" + 
+                    int auxGrade = Convert.ToInt32(reader["CourseGrade"].ToString());
+
+                    if(auxGrade == CourseGrade)
+                    {
+                        Materias += ":" +
+                                reader["SubjectId"].ToString() + ":" +
                                 reader["SubjectName"].ToString() + " (" +
                                 reader["UserName"].ToString() + " " +
                                 reader["UserLastName"].ToString() + ")_";
+                    }
                 }
                 reader.Close();
                 #endregion
