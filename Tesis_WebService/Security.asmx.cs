@@ -756,6 +756,10 @@ namespace Tesis_WebService
                     });
                 }
                 reader.Close();
+
+                #region Eliminando duplicados
+                result = result.Distinct().ToList<object>();
+                #endregion
                 #endregion
             }
             #endregion
@@ -809,13 +813,11 @@ namespace Tesis_WebService
                 SqlDataReader reader = sqlCommand.ExecuteReader();
 
                 while (reader.Read())
-                {
-                    string CoreName = reader["CoreName"].ToString();
+                {                    
                     string Address = reader["Address"].ToString();
 
                     result.Add(new
-                    {
-                        CoreName = CoreName,
+                    {                 
                         Address = Address,
                     });
                 }
@@ -1283,7 +1285,7 @@ namespace Tesis_WebService
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public string InstituteInfo(string InstituteId)
+        public string InstituteInfo(string InstituteId, string CareerId)
         {
             #region Declarando variables
             List<object> result = new List<object>();
@@ -1298,32 +1300,39 @@ namespace Tesis_WebService
                 #endregion
                 #region Definiendo el queryI - Info de la carrera
                 string queryI =
-                    "SELECT I.InstituteId, " + 
-                           "I.[Name] InstituteName, " + 
-                           "I.Profile InstituteProfile, " + 
-                           "C.CoreId, " + 
-                           "C.CoreName, " + 
-                           "C.Address " + 
-                    "FROM Institutes I, " + 
-                         "Cores C " +
-                    "WHERE I.InstituteId = @InstituteId AND " + 
-                          "I.InstituteId = C.InstituteId";
+                    "SELECT I.InstituteId, " +
+                           "I.[Name] InstituteName, " +
+                           "I.Profile InstituteProfile, " +
+                           "C.CoreId, " +
+                           "C.CoreName, " +
+                           "C.Address " +
+                    "FROM Institutes I, " +
+                         "Cores C, " +
+                         "Opportunities O " +
+                    "WHERE I.InstituteId = @InstituteId AND " +
+                          "I.InstituteId = C.InstituteId AND " +
+                          "O.CareerId = @CareerId AND " +
+                          "O.CoreId = C.CoreId AND " + 
+                          "O.InstituteId = I.InstituteId";
                 #endregion
 
                 #region Operaciones para queryI
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
                 sqlCommand.Parameters.AddWithValue("@InstituteId", InstituteId);
+                sqlCommand.Parameters.AddWithValue("@CareerId", CareerId);
                 SqlDataReader reader = sqlCommand.ExecuteReader();
 
                 while (reader.Read())
                 {
                     string InstituteProfile = reader["InstituteProfile"].ToString();
+                    string CoreName = reader["CoreName"].ToString();
                     string CoreId = reader["CoreId"].ToString();
 
                     result.Add(new
                     {
                         InstituteProfile = InstituteProfile,
+                        CoreName = CoreName,
                         CoreId = CoreId,
                     });
                 }
