@@ -1828,9 +1828,12 @@ namespace Tesis_WebService
                 ConstantsRepository.STATISTICS_IMG_1;
             string imgPath2 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
                 ConstantsRepository.STATISTICS_IMG_2;
+            string imgPath3 = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
+                ConstantsRepository.STATISTICS_IMG_3;
 
             imgPath1 = Path.Combine(Server.MapPath(path), imgPath1);
             imgPath2 = Path.Combine(Server.MapPath(path), imgPath2);
+            imgPath3 = Path.Combine(Server.MapPath(path), imgPath3);
             #endregion
             #endregion
             
@@ -1839,22 +1842,28 @@ namespace Tesis_WebService
                 #region Obteniendo imágenes desde rutas
                 Image img1 = Image.FromFile(imgPath1);
                 Image img2 = Image.FromFile(imgPath2);
+                Image img3 = Image.FromFile(imgPath3);
                 #endregion
                 #region Operaciones de conversión a byte[]
                 MemoryStream stream1 = new MemoryStream();
                 MemoryStream stream2 = new MemoryStream();
+                MemoryStream stream3 = new MemoryStream();
 
                 img1.Save(stream1, System.Drawing.Imaging.ImageFormat.Bmp);
                 img2.Save(stream2, System.Drawing.Imaging.ImageFormat.Bmp);
+                img3.Save(stream3, System.Drawing.Imaging.ImageFormat.Bmp);
 
                 byte[] imageByte1 = stream1.ToArray();
                 byte[] imageByte2 = stream2.ToArray();
+                byte[] imageByte3 = stream3.ToArray();
 
                 string imageBase64_1 = Convert.ToBase64String(imageByte1);
                 string imageBase64_2 = Convert.ToBase64String(imageByte2);
-                
-                stream1.Dispose(); stream2.Dispose();
-                img1.Dispose(); img2.Dispose();
+                string imageBase64_3 = Convert.ToBase64String(imageByte3);
+
+                stream1.Dispose(); stream2.Dispose(); stream3.Dispose();
+
+                img1.Dispose(); img2.Dispose(); img3.Dispose();
                 #endregion
                 #region Añadiendo los resultados
                 result.Add(new 
@@ -1867,6 +1876,12 @@ namespace Tesis_WebService
                 {
                     Title = "Top 10 resultados destacados",
                     Image = imageBase64_2
+                });
+
+                result.Add(new
+                {
+                    Title = "Top 10 resultados deficientes",
+                    Image = imageBase64_3
                 });
                 #endregion
             }

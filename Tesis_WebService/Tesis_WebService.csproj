@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C1_AprobadosVsReprobados.png" />
-    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C1_Top10ResultadosDesficientes.png" />
+    <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C1_Top10ResultadosDeficientes.png" />
     <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C1_Top10ResultadosDestacados.png" />
     <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C2_AprobadosVsReprobados.png" />
     <Content Include="App_Uploads\MobileApp_Statistics\School_1\SchoolYear_1\S1Y1C2_Top10ResultadosDeficientes.png" />
