@@ -28,8 +28,10 @@ namespace Tesis_WebService
         public const string STATISTICS_IMAGES_PATH_APP_UPLOADS = @"~\App_Uploads\MobileApp_Statistics\";
         public const string STATISTICS_IMG_1 = "AprobadosVsReprobados.PNG";
         public const string STATISTICS_IMG_2 = "Top10ResultadosDestacados.PNG";
+        public const string STATISTICS_IMG_3 = "Top10ResultadosDeficientes.PNG";
 
         public const int MOBILE_STATISTICS_CODE_AprobadosVsReprobados = 1;
         public const int MOBILE_STATISTICS_CODE_Top10ResultadosDestacados = 2;
+        public const int MOBILE_STATISTICS_CODE_Top10ResultadosDeficientes = 3;
     }
 }

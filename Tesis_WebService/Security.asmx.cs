@@ -1910,6 +1910,10 @@ namespace Tesis_WebService
                     imgPath = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
                         ConstantsRepository.STATISTICS_IMG_2;
                     break;
+                case ConstantsRepository.MOBILE_STATISTICS_CODE_Top10ResultadosDeficientes:
+                    imgPath = "S" + SchoolId + "Y" + SchoolYearId + "C" + CourseId + "_" +
+                        ConstantsRepository.STATISTICS_IMG_3;
+                    break;
             }
             #endregion
             #region Obteniendo la ruta de la imagen
