@@ -1638,8 +1638,12 @@ namespace Tesis_WebService
                     "SELECT TOP 20 " + 
                            "N.Attribution, " +                           
                            "N.AlertType, " +
-                           "CONVERT(DATE, N.DateOfCreation, 105) DateOfCreation, " +
-                           "CONVERT(DATE, N.SendDate, 105) SendDate, " +
+                           "CONVERT(CHAR(2), N.DateOfCreation, 103) DateOfCreation_Day, " +
+                           "CONVERT(CHAR(2), N.DateOfCreation, 101) DateOfCreation_Month, " +
+                           "CONVERT(CHAR(4), N.DateOfCreation, 121) DateOfCreation_Year, " +
+                           "CONVERT(CHAR(2), N.SendDate, 103) SendDate_Day, " +
+                           "CONVERT(CHAR(2), N.SendDate, 101) SendDate_Month, " +
+                           "CONVERT(CHAR(4), N.SendDate, 121) SendDate_Year, " +
                            "N.Message, " +
                            "N.Automatic, " +
                            "N.User_Id UserId, " +
@@ -1698,8 +1702,12 @@ namespace Tesis_WebService
                     {
                         string Attribution = reader["Attribution"].ToString();
                         string AlertType = reader["AlertType"].ToString();
-                        string DateOfCreation = reader["DateOfCreation"].ToString();
-                        string SendDate = reader["SendDate"].ToString();
+                        string DateOfCreation = reader["DateOfCreation_Day"].ToString() +
+                            "/" + reader["DateOfCreation_Month"].ToString() + 
+                            "/" + reader["DateOfCreation_Year"].ToString();
+                        string SendDate = reader["SendDate_Day"].ToString() + 
+                            "/" + reader["SendDate_Month"].ToString() + 
+                            "/" + reader["SendDate_Year"].ToString();
                         string Message = reader["Message"].ToString();
                         string Automatic = reader["Automatic"].ToString();
                         string From = "";
@@ -1804,8 +1812,12 @@ namespace Tesis_WebService
                 string query2 =
                     "SELECT N.Attribution, " +
                            "N.AlertType, " +
-                           "CONVERT(DATE, N.DateOfCreation, 105) DateOfCreation, " +
-                           "CONVERT(DATE, N.SendDate, 105) SendDate, " +
+                           "CONVERT(CHAR(2), N.DateOfCreation, 103) DateOfCreation_Day, " +
+                           "CONVERT(CHAR(2), N.DateOfCreation, 101) DateOfCreation_Month, " +
+                           "CONVERT(CHAR(4), N.DateOfCreation, 121) DateOfCreation_Year, " +
+                           "CONVERT(CHAR(2), N.SendDate, 103) SendDate_Day, " +
+                           "CONVERT(CHAR(2), N.SendDate, 101) SendDate_Month, " +
+                           "CONVERT(CHAR(4), N.SendDate, 121) SendDate_Year, " +
                            "N.Message, " +
                            "N.Automatic, " +
                            "N.User_Id UserId, " +
@@ -1871,8 +1883,12 @@ namespace Tesis_WebService
                     {
                         string Attribution = reader["Attribution"].ToString();
                         string AlertType = reader["AlertType"].ToString();
-                        string DateOfCreation = reader["DateOfCreation"].ToString();
-                        string SendDate = reader["SendDate"].ToString();
+                        string DateOfCreation = reader["DateOfCreation_Day"].ToString() +
+                            "/" + reader["DateOfCreation_Month"].ToString() +
+                            "/" + reader["DateOfCreation_Year"].ToString();
+                        string SendDate = reader["SendDate_Day"].ToString() +
+                            "/" + reader["SendDate_Month"].ToString() +
+                            "/" + reader["SendDate_Year"].ToString();
                         string Message = reader["Message"].ToString();
                         string Automatic = reader["Automatic"].ToString();
                         string From = "";
