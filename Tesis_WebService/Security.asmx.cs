@@ -1280,8 +1280,9 @@ namespace Tesis_WebService
                           "P.SchoolYear_SchoolYearId = SY.SchoolYearId AND " +
                           "SY.School_SchoolId = SCH.SchoolId AND " +
                           "CAST(P.StartDate AS DATE) <= CAST(GETDATE() AS DATE) AND " +
-                          "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE) " + 
-                    "ORDER BY S.FirstName, " + 
+                          "CAST(P.FinishDate AS DATE) >= CAST(GETDATE() AS DATE) " +
+                    "ORDER BY C.Grade DESC, " + 
+                             "S.FirstName, " + 
                              "S.SecondName";
                 /*Este query no incluye obtener información después de la fecha de finalización del último lapso*/
                 #endregion
