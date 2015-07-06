@@ -1636,7 +1636,7 @@ namespace Tesis_WebService
                 #endregion
                 #region QueryII - Notificaciones por estudiantes/cursos
                 string query2 =
-                    "SELECT TOP 20 " + 
+                    "SELECT TOP 8 " + 
                            "N.Attribution, " +                           
                            "N.AlertType, " +
                            "CONVERT(CHAR(2), N.DateOfCreation, 103) DateOfCreation_Day, " +
