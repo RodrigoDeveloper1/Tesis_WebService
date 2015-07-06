@@ -284,6 +284,146 @@ namespace Tesis_WebService
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string AssessmentsToday(string SchoolId, string Grade, string CourseId)
+        {
+            #region Declarando variables
+            List<object> result = new List<object>();
+            SqlConnection sqlConnection = null;
+            string MonthNow = DateTime.Now.Month.ToString();
+            Dictionary<int, string> diccionarioMaterias = new Dictionary<int, string>();
+            #endregion
+
+            #region Try
+            try
+            {
+                #region Estableciendo la conexión a BD
+                sqlConnection = Conexion();
+                #endregion
+                #region Definiendo el queryI - Materias del grado & año escolar
+                string queryI = 
+                    "SELECT S.SubjectId, " + 
+                           "S.[Name] SubjectName " + 
+                    "FROM SUBJECTS S " + 
+                    "WHERE S.School_SchoolId = @SchoolId AND " + 
+                          "S.Grade = @Grade";
+                #endregion
+                #region Definiendo el queryII - Evaluaciones de este mes por materia
+                string queryII =
+                    "SELECT A.AssessmentId, " + 
+                           "A.[Name] AssessmentName, " + 
+                           "A.Percentage, " + 
+                           "CONVERT(CHAR(2), A.StartDate, 103) StartDate_Day, " + 
+                           "CONVERT(CHAR(2), A.StartDate, 101) StartDate_Month, " + 
+                           "CONVERT(CHAR(4), A.StartDate, 121) StartDate_Year, " + 
+                           "CONVERT(CHAR(2), A.FinishDate, 103) FinishDate_Day, " + 
+                           "CONVERT(CHAR(2), A.FinishDate, 101) FinishDate_Month, " + 
+                           "CONVERT(CHAR(4), A.FinishDate, 121) FinishDate_Year, " + 
+                           "A.CASU_CourseId, " + 
+                           "A.CASU_PeriodId, " + 
+                           "A.CASU_SubjectId " + 
+                    "FROM ASSESSMENTS A " + 
+                    "WHERE A.CASU_CourseId = @CourseId AND " + 
+                          "A.CASU_SubjectId = @SubjectId AND " + 
+                          "(CONVERT(CHAR(4), SYSDATETIME(), 100) = CONVERT(CHAR(4), A.StartDate, 100) OR " + 
+                          "CONVERT(CHAR(4), SYSDATETIME(), 100) = CONVERT(CHAR(4), A.FinishDate, 100))";
+                #endregion
+
+                #region Operaciones para query I
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(queryI, sqlConnection);
+                sqlCommand.Parameters.AddWithValue("@SchoolId", SchoolId);
+                sqlCommand.Parameters.AddWithValue("@Grade", Grade);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    int SubjectId = Convert.ToInt32(reader["SubjectId"].ToString());
+                    string SubjectName = reader["SubjectName"].ToString();
+
+                    diccionarioMaterias.Add(SubjectId, SubjectName);
+                }
+
+                reader.Close();
+                sqlConnection.Close();
+                #endregion
+
+                #region Ciclo por cada materia respectiva
+                foreach (KeyValuePair<int, string> PairValue in diccionarioMaterias)
+                {
+                    int SubjectId = PairValue.Key;
+                    string SubjectName = PairValue.Value;
+
+                    #region Operaciones para query II
+                    sqlConnection.Open();
+                    sqlCommand = new SqlCommand(queryII, sqlConnection);
+                    sqlCommand.Parameters.AddWithValue("@CourseId", CourseId);
+                    sqlCommand.Parameters.AddWithValue("@SubjectId", SubjectId);
+                    reader = sqlCommand.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        int AssessmentId = Convert.ToInt32(reader["AssessmentId"].ToString());
+                        
+                        string StartDate_Month = reader["StartDate_Month"].ToString();
+                        string StartDate_Day = reader["StartDate_Day"].ToString();
+                        string StartDate_Year = reader["StartDate_Year"].ToString();
+
+                        string FinishDate_Month = reader["FinishDate_Month"].ToString();
+                        string FinishDate_Day = reader["FinishDate_Day"].ToString();
+                        string FinishDate_Year = reader["FinishDate_Year"].ToString();
+
+                        #region Definiendo el nombre de la evaluación
+                        string Name = reader["AssessmentName"].ToString() + " (" + 
+                            reader["Percentage"].ToString() + "%)";
+                        
+                        if (!StartDate_Month.Equals(FinishDate_Month) || !StartDate_Day.Equals(FinishDate_Day))
+                        {
+                            if (StartDate_Month.Equals(MonthNow))
+                                Name = "Inicia - " + Name;
+                            else
+                                Name = "Finaliza - " + Name;
+                        }
+
+                        Name += " [" + SubjectName + "]";
+                        #endregion
+
+                        result.Add(new
+                        {
+                            Name = Name,
+                            StartDate = StartDate_Day + "/" + StartDate_Month + "/" + StartDate_Year,
+                            FinishDate = FinishDate_Day + "/" + FinishDate_Month + "/" + FinishDate_Year
+                        });
+                    }
+
+                    reader.Close();
+                    sqlConnection.Close();
+                    #endregion
+                }
+                #endregion
+            }
+            #endregion
+            #region Catch
+            catch (SqlException e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            catch (Exception e)
+            {
+                result.Add(new { Success = false, Exception = e.Message });
+            }
+            #endregion
+            #region Finally
+            finally
+            {
+                sqlConnection.Close();
+            }
+            #endregion
+
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string Careers(string StudentId, string SchoolId)
         {
             #region Declarando variables
@@ -1282,6 +1422,8 @@ namespace Tesis_WebService
                     Representative_Name = Representative_Name,
                     Representative_LastName = Representative_LastName,
                     Course_Name = Course_Name,
+                    CourseId = CourseId,
+                    CourseGrade = Grade,
                     Assessment_Name = SubjectName + " - " + AssessmentName,
                     Promedio = PromedioString,
                     StudentId = StudentId,
