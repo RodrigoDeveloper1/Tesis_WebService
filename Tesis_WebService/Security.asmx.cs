@@ -1772,6 +1772,23 @@ namespace Tesis_WebService
             finally
             {
                 sqlConnection.Close();
+
+                //Temporal - Rodrigo Uzcátegui 06-07-15
+                /* Realizado para agregar una notificación vacía para que se pueda expandir correctamente la 
+                 * penúltima notificación, debido al lock del scroll view. */
+                result.Add(new
+                {
+                    Attribution = "",
+                    AlertType = "",
+                    DateOfCreation = "",
+                    SendDate = "",
+                    Message = "",
+                    Automatic = "",
+                    From = "",
+                    NotificationId = "",
+                    Read = "",
+                    New = ""
+                });
             }
             #endregion
 
