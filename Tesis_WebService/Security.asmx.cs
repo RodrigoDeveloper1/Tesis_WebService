@@ -1636,8 +1636,7 @@ namespace Tesis_WebService
                 #endregion
                 #region QueryII - Notificaciones por estudiantes/cursos
                 string query2 =
-                    "SELECT TOP 8 " + 
-                           "N.Attribution, " +                           
+                    "SELECT N.Attribution, " +                           
                            "N.AlertType, " +
                            "CONVERT(CHAR(2), N.DateOfCreation, 103) DateOfCreation_Day, " +
                            "CONVERT(CHAR(2), N.DateOfCreation, 101) DateOfCreation_Month, " +
@@ -1664,7 +1663,7 @@ namespace Tesis_WebService
                     "SELECT Name User_Name, " +
                            "LastName User_LastName " +
                     "FROM AspNetUsers " +
-                    "WHERE Id = '@UserId'";
+                    "WHERE Id = @UserId";
                 #endregion
 
                 #region Conexión - QueryI
@@ -1771,24 +1770,7 @@ namespace Tesis_WebService
             #region Finally
             finally
             {
-                sqlConnection.Close();
-
-                //Temporal - Rodrigo Uzcátegui 06-07-15
-                /* Realizado para agregar una notificación vacía para que se pueda expandir correctamente la 
-                 * penúltima notificación, debido al lock del scroll view. */
-                result.Add(new
-                {
-                    Attribution = "",
-                    AlertType = "",
-                    DateOfCreation = "",
-                    SendDate = "",
-                    Message = "",
-                    Automatic = "",
-                    From = "",
-                    NotificationId = "",
-                    Read = "",
-                    New = ""
-                });
+                sqlConnection.Close();                
             }
             #endregion
 
