@@ -1656,7 +1656,8 @@ namespace Tesis_WebService
                     "WHERE N.NotificationId = SN.NotificationId AND  " +
                          "(SN.Student_StudentId = @StudentId OR " +
                          "SN.Course_CourseId = @CourseId) " +
-                    "ORDER BY N.DateOfCreation DESC";
+                    "ORDER BY N.DateOfCreation DESC, " +
+                             "N.SendDate DESC";
                 #endregion
                 #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
                 string query3 =
@@ -1849,7 +1850,8 @@ namespace Tesis_WebService
                          "(SN.Student_StudentId = @StudentId OR " +
                          "SN.Course_CourseId = @CourseId) AND " +
                          "SN.New = 1 " +
-                    "ORDER BY N.DateOfCreation DESC";
+                    "ORDER BY N.DateOfCreation DESC, " +
+                             "N.SendDate DESC";
                 #endregion
                 #region QueryIII - Usuario que crea la notificación (solo para los casos que aplican)
                 string query3 =
