@@ -1720,6 +1720,8 @@ namespace Tesis_WebService
                             From = "Notificación Automática";
                         else
                         {
+                            Attribution = reader["AlertType"].ToString();
+                            
                             string TeacherId = reader["UserId"].ToString();
 
                             #region Conexión - QueryIII
@@ -1733,6 +1735,8 @@ namespace Tesis_WebService
                                     reader2["User_LastName"].ToString();
 
                             reader2.Close();
+
+                            
                         }
                         #endregion
                         #region Resultado final
@@ -1915,6 +1919,8 @@ namespace Tesis_WebService
                             From = "Notificación Automática";
                         else
                         {
+                            Attribution = reader["AlertType"].ToString();
+
                             string TeacherId = reader["UserId"].ToString();
 
                             #region Conexión - QueryIII
