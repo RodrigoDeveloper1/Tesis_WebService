@@ -1838,7 +1838,7 @@ namespace Tesis_WebService
                     "SELECT Name User_Name, " +
                            "LastName User_LastName " +
                     "FROM AspNetUsers " +
-                    "WHERE Id = '@UserId'";
+                    "WHERE Id = @UserId";
                 #endregion
                 #region Query IV - Actualizador de 'News' para notificaciones
                 string query4 =
