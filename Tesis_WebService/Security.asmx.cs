@@ -1770,7 +1770,21 @@ namespace Tesis_WebService
             #region Finally
             finally
             {
-                sqlConnection.Close();                
+                sqlConnection.Close();
+
+                result.Add(new
+                {
+                    Attribution = "",
+                    AlertType = "",
+                    DateOfCreation = "",
+                    SendDate = "",
+                    Message = "",
+                    Automatic = "",
+                    From = "",
+                    NotificationId = "",
+                    Read = "",
+                    New = ""
+                });
             }
             #endregion
 
