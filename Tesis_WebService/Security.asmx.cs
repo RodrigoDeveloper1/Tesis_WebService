@@ -1831,6 +1831,7 @@ namespace Tesis_WebService
                 string query2 =
                     "SELECT N.Attribution, " +
                            "N.AlertType, " +
+                           "N.NotificationId, " +
                            "CONVERT(CHAR(2), N.DateOfCreation, 103) DateOfCreation_Day, " +
                            "CONVERT(CHAR(2), N.DateOfCreation, 101) DateOfCreation_Month, " +
                            "CONVERT(CHAR(4), N.DateOfCreation, 121) DateOfCreation_Year, " +
